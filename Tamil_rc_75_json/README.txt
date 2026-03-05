@@ -1,0 +1,1 @@
+See books_order.json and data/*/*.json. Each chapter is an array of blocks: titles (T) and verses (V).

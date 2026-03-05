@@ -1,0 +1,308 @@
+{
+  "old_testament": [
+    {
+      "bookNum": 1,
+      "name_ta": "தொடக்க நூல்"
+    },
+    {
+      "bookNum": 2,
+      "name_ta": "விடுதலைப் பயணம்"
+    },
+    {
+      "bookNum": 3,
+      "name_ta": "லேவியர்"
+    },
+    {
+      "bookNum": 4,
+      "name_ta": "எண்ணிக்கை"
+    },
+    {
+      "bookNum": 5,
+      "name_ta": "இணைச் சட்டம்"
+    },
+    {
+      "bookNum": 6,
+      "name_ta": "யோசுவா"
+    },
+    {
+      "bookNum": 7,
+      "name_ta": "நீதித் தலைவர்கள்"
+    },
+    {
+      "bookNum": 8,
+      "name_ta": "ரூத்து"
+    },
+    {
+      "bookNum": 9,
+      "name_ta": "1 சாமுவேல்"
+    },
+    {
+      "bookNum": 10,
+      "name_ta": "2 சாமுவேல்"
+    },
+    {
+      "bookNum": 11,
+      "name_ta": "1 அரசர்கள்"
+    },
+    {
+      "bookNum": 12,
+      "name_ta": "2 அரசர்கள்"
+    },
+    {
+      "bookNum": 13,
+      "name_ta": "1 குறிப்பேடு"
+    },
+    {
+      "bookNum": 14,
+      "name_ta": "2 குறிப்பேடு"
+    },
+    {
+      "bookNum": 15,
+      "name_ta": "எஸ்ரா"
+    },
+    {
+      "bookNum": 16,
+      "name_ta": "நெகேமியா"
+    },
+    {
+      "bookNum": 17,
+      "name_ta": "எஸ்தர்"
+    },
+    {
+      "bookNum": 18,
+      "name_ta": "யோபு"
+    },
+    {
+      "bookNum": 19,
+      "name_ta": "திருப்பாடல்கள்"
+    },
+    {
+      "bookNum": 20,
+      "name_ta": "நீதிமொழிகள்"
+    },
+    {
+      "bookNum": 21,
+      "name_ta": "சபை உரையாளர்"
+    },
+    {
+      "bookNum": 22,
+      "name_ta": "இனிமைமிகு பாடல்"
+    },
+    {
+      "bookNum": 23,
+      "name_ta": "எசாயா"
+    },
+    {
+      "bookNum": 24,
+      "name_ta": "எரேமியா"
+    },
+    {
+      "bookNum": 25,
+      "name_ta": "புலம்பல்"
+    },
+    {
+      "bookNum": 26,
+      "name_ta": "எசேக்கியேல்"
+    },
+    {
+      "bookNum": 27,
+      "name_ta": "தானியேல்"
+    },
+    {
+      "bookNum": 28,
+      "name_ta": "ஒசேயா"
+    },
+    {
+      "bookNum": 29,
+      "name_ta": "யோவேல்"
+    },
+    {
+      "bookNum": 30,
+      "name_ta": "ஆமோஸ்"
+    },
+    {
+      "bookNum": 31,
+      "name_ta": "ஒபதியா"
+    },
+    {
+      "bookNum": 32,
+      "name_ta": "யோனா"
+    },
+    {
+      "bookNum": 33,
+      "name_ta": "மீக்கா"
+    },
+    {
+      "bookNum": 34,
+      "name_ta": "நாகூம்"
+    },
+    {
+      "bookNum": 35,
+      "name_ta": "அபக்கூக்கு"
+    },
+    {
+      "bookNum": 36,
+      "name_ta": "செப்பனியா"
+    },
+    {
+      "bookNum": 37,
+      "name_ta": "ஆகாய்"
+    },
+    {
+      "bookNum": 38,
+      "name_ta": "செக்கரியா"
+    },
+    {
+      "bookNum": 39,
+      "name_ta": "மலாக்கி"
+    }
+  ],
+  "deuterocanon": [
+    {
+      "bookNum": 40,
+      "name_ta": "தோபித்து"
+    },
+    {
+      "bookNum": 41,
+      "name_ta": "யூதித்து"
+    },
+    {
+      "bookNum": 42,
+      "name_ta": "எஸ்தர் (கி)"
+    },
+    {
+      "bookNum": 43,
+      "name_ta": "சாலமோனின் ஞானம்"
+    },
+    {
+      "bookNum": 44,
+      "name_ta": "சீராக்"
+    },
+    {
+      "bookNum": 45,
+      "name_ta": "பாரூக்கு"
+    },
+    {
+      "bookNum": 46,
+      "name_ta": "தானியேல் (இ)"
+    },
+    {
+      "bookNum": 47,
+      "name_ta": "1 மக்கபேயர்"
+    },
+    {
+      "bookNum": 48,
+      "name_ta": "2 மக்கபேயர்"
+    }
+  ],
+  "new_testament": [
+    {
+      "bookNum": 49,
+      "name_ta": "மத்தேயு"
+    },
+    {
+      "bookNum": 50,
+      "name_ta": "மாற்கு"
+    },
+    {
+      "bookNum": 51,
+      "name_ta": "லூக்கா"
+    },
+    {
+      "bookNum": 52,
+      "name_ta": "யோவான்"
+    },
+    {
+      "bookNum": 53,
+      "name_ta": "திருத்தூதர் பணிகள்"
+    },
+    {
+      "bookNum": 54,
+      "name_ta": "உரோமையர்"
+    },
+    {
+      "bookNum": 55,
+      "name_ta": "1 கொரிந்தியர்"
+    },
+    {
+      "bookNum": 56,
+      "name_ta": "2 கொரிந்தியர்"
+    },
+    {
+      "bookNum": 57,
+      "name_ta": "கலாத்தியர்"
+    },
+    {
+      "bookNum": 58,
+      "name_ta": "எபேசியர்"
+    },
+    {
+      "bookNum": 59,
+      "name_ta": "பிலிப்பியர்"
+    },
+    {
+      "bookNum": 60,
+      "name_ta": "கொலோசையர்"
+    },
+    {
+      "bookNum": 61,
+      "name_ta": "1 தெசலோனிக்கர்"
+    },
+    {
+      "bookNum": 62,
+      "name_ta": "2 தெசலோனிக்கர்"
+    },
+    {
+      "bookNum": 63,
+      "name_ta": "1 திமொத்தேயு"
+    },
+    {
+      "bookNum": 64,
+      "name_ta": "2 திமொத்தேயு"
+    },
+    {
+      "bookNum": 65,
+      "name_ta": "தீத்து"
+    },
+    {
+      "bookNum": 66,
+      "name_ta": "பிலமோன்"
+    },
+    {
+      "bookNum": 67,
+      "name_ta": "எபிரேயர்"
+    },
+    {
+      "bookNum": 68,
+      "name_ta": "யாக்கோபு"
+    },
+    {
+      "bookNum": 69,
+      "name_ta": "1 பேதுரு"
+    },
+    {
+      "bookNum": 70,
+      "name_ta": "2 பேதுரு"
+    },
+    {
+      "bookNum": 71,
+      "name_ta": "1 யோவான்"
+    },
+    {
+      "bookNum": 72,
+      "name_ta": "2 யோவான்"
+    },
+    {
+      "bookNum": 73,
+      "name_ta": "3 யோவான்"
+    },
+    {
+      "bookNum": 74,
+      "name_ta": "யூதா"
+    },
+    {
+      "bookNum": 75,
+      "name_ta": "திருவெளிப்பாடு"
+    }
+  ]
+}

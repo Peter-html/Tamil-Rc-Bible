@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="ta" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>வார்த்தை வாசிப்பு - Tamil RC Bible App</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body class="h-full overflow-auto">
+  <div class="app-wrapper">
+
+    <!-- TOP NAV (DESKTOP) -->
+    <nav class="desktop-layout sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
+            <div>
+              <h1 id="app-title" class="text-lg font-bold text-gray-800">வார்த்தை வாசிப்பு</h1>
+              <p class="text-xs text-gray-500">Tamil RC Bible | Online/Offline</p>
+            </div>
+          </div>
+
+          <div class="hidden lg:flex items-center space-x-6">
+            <button class="nav-link text-sm font-medium text-blue-600" data-dnav="home">முகப்பு</button>
+            <button class="nav-link text-sm font-medium text-gray-600 hover:text-blue-600" data-dnav="read">வாசிக்க</button>
+            <button class="nav-link text-sm font-medium text-gray-600 hover:text-blue-600" data-dnav="songs">பாடல்கள்</button>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <div class="hidden sm:flex items-center space-x-1 bg-gray-100 rounded-lg px-2 py-1">
+              <button id="font-decrease" class="w-7 h-7 rounded flex items-center justify-center text-gray-600 hover:bg-white text-sm font-medium">A-</button>
+              <button id="font-increase" class="w-7 h-7 rounded flex items-center justify-center text-gray-600 hover:bg-white text-sm font-medium">A+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MOBILE HEADER -->
+    <div class="mobile-layout hidden sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100 px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+          </div>
+          <div>
+            <h1 id="app-title-mobile" class="text-sm font-bold text-gray-800">வார்த்தை வாசிப்பு</h1>
+            <p class="text-xs text-gray-500">Tamil Bible</p>
+          </div>
+        </div>
+        <button id="m-settings" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- MOBILE TABS -->
+    <div class="mobile-layout hidden sticky top-12 z-40 bg-white border-b border-gray-100 flex">
+      <button class="mobile-tab active" data-mtab="m-home">முகப்பு</button>
+      <button class="mobile-tab" data-mtab="m-read">வாசிக்க</button>
+      <button class="mobile-tab" data-mtab="m-songs">பாடல்கள்</button>
+    </div>
+
+    <!-- =========================
+         DESKTOP SCREENS
+    ========================== -->
+    <main class="desktop-layout">
+
+      <!-- HOME -->
+      <section id="d-home" class="d-screen">
+        <section class="py-12 px-4 sm:px-6 lg:px-8">
+          <div class="max-w-4xl mx-auto text-center">
+            <h2 id="hero-title" class="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">பரிசுத்த வேதாகமம்</h2>
+            <p id="hero-subtitle" class="text-lg text-gray-600 mb-8">உங்கள் தினசரி வாசிப்புக்கு — எளிதாக, அழகாக, வேகமாக.</p>
+          </div>
+        </section>
+
+        <!-- RANDOM DAILY VERSE -->
+        <section class="px-4 sm:px-6 lg:px-8 pb-12">
+          <div class="max-w-6xl mx-auto">
+            <div class="verse-card rounded-3xl card-shadow p-8">
+              <div class="flex items-center justify-between gap-4 mb-6">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-800">இன்றைய வசனம் (Random)</h3>
+                </div>
+
+                <button id="random-verse-btn" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-semibold">
+                  Random Verse
+                </button>
+              </div>
+
+              <p id="verse-text" class="text-xl text-gray-700 leading-relaxed italic mb-4">"—"</p>
+              <p id="verse-reference" class="text-sm font-semibold text-orange-600">—</p>
+              <p id="random-verse-status" class="text-xs text-gray-500 mt-3"></p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- READ (Books → Reader) -->
+      <section id="d-read" class="d-screen hidden">
+        <section class="px-4 sm:px-6 lg:px-8 py-8">
+          <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white rounded-3xl card-shadow p-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-800">பழைய ஏற்பாடு + (RC) துணை நூல்கள்</h3>
+                  <p class="text-sm text-gray-500" id="d-ot-count">Loading...</p>
+                </div>
+              </div>
+              <div class="space-y-2 max-h-[520px] overflow-y-auto scrollbar-thin pr-2" id="d-ot-books"></div>
+            </div>
+
+            <div class="bg-white rounded-3xl card-shadow p-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-800">புதிய ஏற்பாடு</h3>
+                  <p class="text-sm text-gray-500" id="d-nt-count">Loading...</p>
+                </div>
+              </div>
+              <div class="space-y-2 max-h-[520px] overflow-y-auto scrollbar-thin pr-2" id="d-nt-books"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- READER SCREEN (NEXT SLIDE) -->
+        <section id="d-reader" class="px-4 sm:px-6 lg:px-8 pb-12 hidden">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-4">
+              <button id="d-back-books" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-50">
+                ← Back to Books
+              </button>
+              <div class="text-right">
+                <div id="d-reader-title" class="text-xl font-bold text-gray-800">—</div>
+                <div id="d-reader-subtitle" class="text-sm text-gray-500">—</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- LEFT: Chapters + Verse list -->
+              <div class="lg:col-span-1 bg-white rounded-3xl card-shadow p-6 max-h-[720px] overflow-hidden flex flex-col">
+                <div class="flex items-center space-x-3 mb-4">
+                  <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-800">அதிகாரம் & வசனங்கள்</h3>
+                    <p class="text-xs text-gray-500" id="d-left-info">—</p>
+                  </div>
+                </div>
+
+                <div id="d-chapters" class="mb-4 p-3 bg-gray-50 rounded-lg flex flex-wrap gap-2 max-h-44 overflow-y-auto scrollbar-thin">
+                  <p class="text-xs text-gray-500 w-full">அதிகாரங்களைத் தேர்ந்தெடுக்கவும்</p>
+                </div>
+
+                <div id="d-verse-list" class="flex-1 bg-gray-50 rounded-lg overflow-y-auto space-y-1 p-3 scrollbar-thin">
+                  <p class="text-xs text-gray-500 text-center">வசனங்கள் இங்கே வரும்</p>
+                </div>
+              </div>
+
+              <!-- RIGHT: Verse display + Highlighter + Bio -->
+              <div class="lg:col-span-2 bg-white rounded-3xl card-shadow p-6 max-h-[720px] overflow-hidden flex flex-col">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                  <div>
+                    <h3 class="text-lg font-bold text-gray-800">வசனங்கள் வாசிப்பு</h3>
+                    <p class="text-sm text-gray-600" id="d-verse-header">வசனத்தைத் தேர்ந்தெடுக்கவும்</p>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <button id="d-toggle-highlighter" class="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-xl text-sm font-semibold hover:bg-yellow-200">
+                      Highlight
+                    </button>
+                    <button id="d-clear-highlights" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                <div id="d-highlighter-toolbar" class="hidden mb-4 p-3 bg-yellow-50 rounded-xl flex gap-2 items-center">
+                  <span class="text-xs font-semibold text-gray-700">நிறங்கள்:</span>
+                  <button class="hl-dot" data-color="#FDE047" title="மஞ்சள்"></button>
+                  <button class="hl-dot" data-color="#86EFAC" title="பச்சை"></button>
+                  <button class="hl-dot" data-color="#93C5FD" title="நீலம்"></button>
+                  <button class="hl-dot" data-color="#F472B6" title="இளஞ்சிவப்பு"></button>
+                  <button class="hl-dot" data-color="#FECACA" title="சிவப்பு"></button>
+                  <span class="ml-auto text-xs text-gray-600">Text select செய்து color தேர்வு செய்து highlight ஆகும்</span>
+                </div>
+
+                <div id="d-verse-container" class="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-xl mb-4 scrollbar-thin">
+                  <p class="text-gray-500 text-center text-base">வசனங்கள் இங்கே வெளிப்படும்</p>
+                </div>
+
+                <!-- BIO SEARCH -->
+                <div class="mt-2 pt-4 border-t border-gray-200">
+                  <div class="flex gap-2">
+                    <input type="text" id="d-bio-q" placeholder="யார் இவர்? (உதா: தாவீது / மோசே / பவுல்)" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <button id="d-bio-search" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700">
+                      தேடுங்கள்
+                    </button>
+                  </div>
+
+                  <div id="d-bio-result" class="mt-3 p-3 bg-blue-50 rounded-xl hidden">
+                    <div class="text-sm font-bold text-gray-800 mb-1" id="d-bio-title">Bio</div>
+                    <div class="text-sm text-gray-700" id="d-bio-text"></div>
+                    <div class="text-xs text-gray-600 mt-2" id="d-bio-verses"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div id="d-data-status" class="text-xs text-gray-500 mt-4"></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- SONGS -->
+      <section id="d-songs" class="d-screen hidden">
+        <section class="px-4 sm:px-6 lg:px-8 py-10">
+          <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl card-shadow p-6">
+              <h2 class="text-2xl font-bold text-gray-800 mb-2">பாடல்கள் (Search)</h2>
+              <p class="text-sm text-gray-600 mb-5">Songs JSON இப்போ placeholder. பின்னாடி STT + LLM search add செய்யலாம்.</p>
+
+              <div class="flex gap-2 mb-4">
+                <input id="d-song-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="பாடல் பெயர் / வரி (lyrics)..." />
+                <button id="d-song-search" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700">Search</button>
+                <button id="d-song-stt" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200">🎙️ STT</button>
+              </div>
+
+              <div id="d-song-results" class="space-y-3"></div>
+              <div id="d-song-status" class="text-xs text-gray-500 mt-3"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <!-- =========================
+         MOBILE SCREENS
+    ========================== -->
+    <main class="mobile-layout hidden pb-20">
+
+      <!-- MOBILE HOME -->
+      <section id="m-home" class="m-screen px-4 py-4 space-y-3">
+        <div class="bg-white rounded-2xl p-4 shadow-sm">
+          <h2 class="text-lg font-bold text-gray-800 mb-2">பரிசுத்த வேதாகமம்</h2>
+          <p class="text-sm text-gray-600">உங்கள் தினசரி வாசிப்புக்கு — எளிதாக, அழகாக, வேகமாக.</p>
+        </div>
+
+        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 shadow-sm border-l-4 border-orange-500">
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-semibold text-gray-800 text-sm mb-1">Random Verse</h3>
+                <button id="m-random-verse-btn" class="text-xs font-bold text-orange-600 bg-white/70 px-3 py-1 rounded-xl">Random</button>
+              </div>
+              <p id="m-verse-text" class="text-xs text-gray-700 italic mb-2">"—"</p>
+              <p id="m-verse-ref" class="text-xs font-medium text-orange-600">—</p>
+              <p id="m-random-verse-status" class="text-[11px] text-gray-500 mt-2"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MOBILE READ -->
+      <section id="m-read" class="m-screen hidden px-4 py-4">
+        <!-- BOOK LIST -->
+        <div id="m-book-list">
+          <div class="bg-white rounded-2xl p-4 shadow-sm mb-3">
+            <h3 class="text-sm font-bold text-gray-800">பழைய ஏற்பாடு + (RC) துணை நூல்கள்</h3>
+            <p class="text-xs text-gray-500" id="m-ot-count">Loading...</p>
+          </div>
+          <div class="space-y-2 mb-6" id="m-ot-books"></div>
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm mb-3">
+            <h3 class="text-sm font-bold text-gray-800">புதிய ஏற்பாடு</h3>
+            <p class="text-xs text-gray-500" id="m-nt-count">Loading...</p>
+          </div>
+          <div class="space-y-2" id="m-nt-books"></div>
+        </div>
+
+        <!-- MOBILE READER (NEXT SLIDE) -->
+        <div id="m-reader" class="hidden">
+          <div class="flex items-center justify-between mb-3">
+            <button id="m-back-books" class="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-50">
+              ← Back
+            </button>
+            <div class="text-right">
+              <div id="m-reader-title" class="text-sm font-bold text-gray-800">—</div>
+              <div id="m-reader-subtitle" class="text-xs text-gray-500">—</div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-3 shadow-sm mb-3">
+            <div class="text-xs font-bold text-gray-700 mb-2">அதிகாரம்</div>
+            <div id="m-chapters" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto scrollbar-thin"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-3 shadow-sm mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-xs font-bold text-gray-700">வசனங்கள்</div>
+              <div class="flex gap-2">
+                <button id="m-toggle-highlighter" class="text-xs font-bold bg-yellow-100 text-yellow-800 px-3 py-1 rounded-xl">Highlight</button>
+                <button id="m-clear-highlights" class="text-xs font-bold bg-gray-100 text-gray-700 px-3 py-1 rounded-xl">Clear</button>
+              </div>
+            </div>
+
+            <div id="m-highlighter-toolbar" class="hidden mb-2 p-2 bg-yellow-50 rounded-xl flex gap-2 items-center">
+              <button class="hl-dot" data-color="#FDE047"></button>
+              <button class="hl-dot" data-color="#86EFAC"></button>
+              <button class="hl-dot" data-color="#93C5FD"></button>
+              <button class="hl-dot" data-color="#F472B6"></button>
+              <button class="hl-dot" data-color="#FECACA"></button>
+              <span class="ml-auto text-[11px] text-gray-600">select → highlight</span>
+            </div>
+
+            <div id="m-verse-container" class="p-3 bg-gray-50 rounded-xl max-h-64 overflow-y-auto scrollbar-thin">
+              <p class="text-xs text-gray-500 text-center">வசனங்கள் இங்கே வெளிப்படும்</p>
+            </div>
+
+            <div id="m-verse-list" class="mt-3 p-2 bg-gray-50 rounded-xl max-h-48 overflow-y-auto scrollbar-thin space-y-1">
+              <p class="text-xs text-gray-500 text-center">Verse list</p>
+            </div>
+
+            <!-- BIO -->
+            <div class="mt-3">
+              <div class="flex gap-2">
+                <input id="m-bio-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="யார் இவர்? (தாவீது/மோசே)" />
+                <button id="m-bio-search" class="px-3 py-2 bg-purple-600 text-white rounded-xl text-xs font-semibold hover:bg-purple-700">தேடுங்கள்</button>
+              </div>
+              <div id="m-bio-result" class="mt-2 p-3 bg-blue-50 rounded-xl hidden">
+                <div class="text-xs font-bold text-gray-800 mb-1" id="m-bio-title">Bio</div>
+                <div class="text-xs text-gray-700" id="m-bio-text"></div>
+                <div class="text-[11px] text-gray-600 mt-2" id="m-bio-verses"></div>
+              </div>
+            </div>
+
+            <div id="m-data-status" class="text-[11px] text-gray-500 mt-3"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MOBILE SONGS -->
+      <section id="m-songs" class="m-screen hidden px-4 py-4">
+        <div class="bg-white rounded-2xl p-4 shadow-sm">
+          <h3 class="text-sm font-bold text-gray-800 mb-2">பாடல்கள்</h3>
+
+          <div class="flex gap-2 mb-3">
+            <input id="m-song-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="பாடல் பெயர் / வரி..." />
+            <button id="m-song-search" class="px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700">Search</button>
+            <button id="m-song-stt" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-200">🎙️</button>
+          </div>
+
+          <div id="m-song-results" class="space-y-3"></div>
+          <div id="m-song-status" class="text-[11px] text-gray-500 mt-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto text-center">
+        <p class="text-sm text-gray-600">© 2026 | Tamil RC Bible PWA | Offline-first</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>
