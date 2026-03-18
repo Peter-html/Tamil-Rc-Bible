@@ -1,839 +1,622 @@
-/* ===========================
-   Tamil RC Bible App (Offline-first)
-   - Books from ./books_order.json  (your file) :contentReference[oaicite:1]{index=1}
-   - Bible text: flexible loader (tries many paths/shapes)
-   - Reader: chapters + verse list + highlighter + bio search
-   - Random verse: uses loaded text if available, else loads a random book
-   - Songs: placeholder via ./data/songs.json
-=========================== */
+/* =========================================================
+   CONFIG
+========================================================= */
+const BOOKS_ORDER_URL = "./books_order.json";
+const DATA_FOLDERS = { ot: "./data/ot", nt: "./data/nt" };
 
-const $ = (id) => document.getElementById(id);
+function detectTestament(n) { return n >= 49 ? "nt" : "ot"; }
+function buildCandidatePaths(bookNum) {
+  const base = detectTestament(bookNum) === "ot" ? DATA_FOLDERS.ot : DATA_FOLDERS.nt;
+  return [
+    `${base}/${bookNum}.json`,
+    `${base}/${String(bookNum).padStart(2,"0")}.json`,
+    `${base}/book_${bookNum}.json`,
+    `${base}/book${bookNum}.json`,
+  ];
+}
 
-/** -------------------------
- *  SETTINGS (EDITABLE)
- *  If later you add a backend LLM API, set BIO_API_URL to your endpoint.
- *  Example: "https://your-domain.com/api/bio"
--------------------------- */
-const BIO_API_URL = "";     // keep "" for local-only mode now
-const SONGS_JSON_PATH = "./data/songs.json"; // optional
-
-/** -------------------------
- *  App State
--------------------------- */
-let currentFontSize = 16;
-
-let booksOrder = null; // loaded from books_order.json
-let allBooksFlat = []; // [{bookNum, name_ta, group}...]
-let currentBook = null; // {bookNum, name_ta}
+/* =========================================================
+   STATE
+========================================================= */
+let booksOrder = null;
+let currentBook = null;
 let currentChapter = 1;
-
+const bookCache = new Map();
+let fontSize = 16;
+let highlightEnabled = false;
 let highlightColor = "#FDE047";
-let highlightModeDesktop = false;
-let highlightModeMobile = false;
 
-// Caches
-const bookTextCache = new Map();  // bookNum -> normalizedBookData
-let combinedBibleCache = null;    // if you have one big JSON file, we can load it here
+/* TTS */
+let ttsVerses = [];
+let ttsCurrentIdx = 0;
+let ttsPlaying = false;
+let ttsPaused  = false;
+let ttsSupported = false;
+let _ttsRate = 0.85;
 
-/** -------------------------
- *  NORMALIZED BOOK DATA FORMAT (what we convert everything into)
- *  {
- *    bookNum: number,
- *    name_ta: string,
- *    chapters: [
- *      [ {v:1, t:"..."}, {v:2, t:"..."} ],   // chapter 1
- *      [ ... ]                              // chapter 2
- *    ]
- *  }
--------------------------- */
+/* =========================================================
+   DOM HELPERS
+========================================================= */
+const $ = id => document.getElementById(id);
+const show = id => $(id)?.classList.remove("hidden");
+const hide = id => $(id)?.classList.add("hidden");
+const setText = (id, t) => { const e=$(id); if(e) e.textContent=t; };
+function escapeHTML(s) {
+  return (s||"").replace(/[&<>"']/g,m=>({'&':"&amp;",'<':"&lt;",'>':"&gt;",'"':"&quot;","'":'&#039;'}[m]));
+}
+const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
 
-/** -------------------------
- *  UTIL: UI Navigation
--------------------------- */
-function showDesktopScreen(key) {
-  document.querySelectorAll(".d-screen").forEach(s => s.classList.add("hidden"));
-  const el = $(`d-${key}`);
-  if (el) el.classList.remove("hidden");
+/* =========================================================
+   CROSS INTRO → APP REVEAL
+========================================================= */
+function startIntro() {
+  const intro = $("crossIntro");
+  const app   = $("app");
 
-  // highlight nav colors
-  document.querySelectorAll("[data-dnav]").forEach(btn => {
-    btn.classList.remove("text-blue-600");
-    btn.classList.add("text-gray-600");
-  });
-  const active = document.querySelector(`[data-dnav="${key}"]`);
-  if (active) {
-    active.classList.add("text-blue-600");
-    active.classList.remove("text-gray-600");
-  }
+  // After 3.8s — fade out cross, show app
+  setTimeout(() => {
+    intro.classList.add("fade-out");
+    setTimeout(() => {
+      intro.style.display = "none";
+      app.classList.add("visible");
+      initScrollReveal();
+    }, 1000);
+  }, 3200);
 }
 
-function showMobileScreen(key) {
-  document.querySelectorAll(".m-screen").forEach(s => s.classList.add("hidden"));
-  const el = $(key);
-  if (el) el.classList.remove("hidden");
-
-  document.querySelectorAll(".mobile-tab").forEach(t => t.classList.remove("active"));
-  const tab = document.querySelector(`.mobile-tab[data-mtab="${key}"]`);
-  if (tab) tab.classList.add("active");
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+function initScrollReveal() {
+  const els = document.querySelectorAll(".reveal");
+  if (!els.length) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add("visible"); });
+  }, { threshold: 0.12 });
+  els.forEach(el => obs.observe(el));
 }
 
-/** -------------------------
- *  Books Loader
--------------------------- */
+/* =========================================================
+   NAV — only 3 screens now (no saints)
+========================================================= */
+function go(screen) {
+  ["home","reader","songs"].forEach(s => hide(`screen-${s}`));
+  show(`screen-${screen}`);
+  document.querySelectorAll("[data-screen]").forEach(b =>
+    b.classList.toggle("active", b.dataset.screen === screen));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* =========================================================
+   FETCH
+========================================================= */
 async function loadBooksOrder() {
-  const res = await fetch("./books_order.json");
-  if (!res.ok) throw new Error("books_order.json load failed");
-  booksOrder = await res.json();
-
-  const ot = booksOrder.old_testament || [];
-  const deut = booksOrder.deuterocanon || [];
-  const nt = booksOrder.new_testament || [];
-
-  allBooksFlat = [
-    ...ot.map(b => ({ ...b, group: "ot" })),
-    ...deut.map(b => ({ ...b, group: "ot" })),   // treat RC deuterocanon as OT group UI
-    ...nt.map(b => ({ ...b, group: "nt" })),
-  ];
-
-  // counts
-  const otCount = ot.length + deut.length;
-  const ntCount = nt.length;
-
-  // desktop counts
-  $("d-ot-count").textContent = `${otCount} புத்தகங்கள்`;
-  $("d-nt-count").textContent = `${ntCount} புத்தகங்கள்`;
-
-  // mobile counts
-  $("m-ot-count").textContent = `${otCount} புத்தகங்கள்`;
-  $("m-nt-count").textContent = `${ntCount} புத்தகங்கள்`;
-
-  renderBooks();
+  const r = await fetch(BOOKS_ORDER_URL, { cache:"no-store" });
+  if (!r.ok) throw new Error(`books_order.json HTTP ${r.status}`);
+  return r.json();
 }
 
-function renderBooks() {
-  // Desktop
-  const dOt = $("d-ot-books");
-  const dNt = $("d-nt-books");
-  dOt.innerHTML = "";
-  dNt.innerHTML = "";
-
-  // Mobile
-  const mOt = $("m-ot-books");
-  const mNt = $("m-nt-books");
-  mOt.innerHTML = "";
-  mNt.innerHTML = "";
-
-  const otBooks = allBooksFlat.filter(b => b.group === "ot");
-  const ntBooks = allBooksFlat.filter(b => b.group === "nt");
-
-  otBooks.forEach(b => {
-    dOt.appendChild(makeDesktopBookButton(b, false));
-    mOt.appendChild(makeMobileBookButton(b, false));
-  });
-
-  ntBooks.forEach(b => {
-    dNt.appendChild(makeDesktopBookButton(b, true));
-    mNt.appendChild(makeMobileBookButton(b, true));
-  });
-}
-
-function makeDesktopBookButton(book, isNT) {
-  const btn = document.createElement("button");
-  btn.className = "book-btn";
-  btn.innerHTML = `
-    <div>
-      <div class="font-bold text-gray-800">${escapeHtml(book.name_ta)}</div>
-      <div class="text-xs text-gray-500">Book #${book.bookNum}</div>
-    </div>
-    <span class="book-chip ${isNT ? "nt" : ""}">Open</span>
-  `;
-  btn.addEventListener("click", () => openReaderDesktop(book.bookNum));
-  return btn;
-}
-
-function makeMobileBookButton(book, isNT) {
-  const btn = document.createElement("button");
-  btn.className = "book-btn";
-  btn.innerHTML = `
-    <div>
-      <div class="font-bold text-gray-800 text-sm">${escapeHtml(book.name_ta)}</div>
-      <div class="text-[11px] text-gray-500">Book #${book.bookNum}</div>
-    </div>
-    <span class="book-chip ${isNT ? "nt" : ""}">Open</span>
-  `;
-  btn.addEventListener("click", () => openReaderMobile(book.bookNum));
-  return btn;
-}
-
-/** -------------------------
- *  Reader open (Next slide)
--------------------------- */
-async function openReaderDesktop(bookNum) {
-  currentBook = allBooksFlat.find(b => b.bookNum === bookNum) || { bookNum, name_ta: `Book ${bookNum}` };
-  currentChapter = 1;
-
-  // hide book lists, show reader
-  $("d-reader").classList.remove("hidden");
-  $("d-reader-title").textContent = currentBook.name_ta;
-  $("d-reader-subtitle").textContent = `Book #${currentBook.bookNum}`;
-  $("d-left-info").textContent = `${currentBook.name_ta}`;
-
-  // scroll to reader
-  $("d-reader").scrollIntoView({ behavior: "smooth", block: "start" });
-
-  // Load data
-  const data = await ensureBookLoaded(bookNum, "desktop");
-  if (!data) return;
-
-  renderChapterButtons("desktop", data);
-  await setChapter("desktop", 1);
-}
-
-async function openReaderMobile(bookNum) {
-  currentBook = allBooksFlat.find(b => b.bookNum === bookNum) || { bookNum, name_ta: `Book ${bookNum}` };
-  currentChapter = 1;
-
-  // next slide: hide list, show reader
-  $("m-book-list").classList.add("hidden");
-  $("m-reader").classList.remove("hidden");
-
-  $("m-reader-title").textContent = currentBook.name_ta;
-  $("m-reader-subtitle").textContent = `Book #${currentBook.bookNum}`;
-
-  const data = await ensureBookLoaded(bookNum, "mobile");
-  if (!data) return;
-
-  renderChapterButtons("mobile", data);
-  await setChapter("mobile", 1);
-}
-
-/** Back buttons */
-function backToBooksDesktop() {
-  $("d-reader").classList.add("hidden");
-}
-function backToBooksMobile() {
-  $("m-reader").classList.add("hidden");
-  $("m-book-list").classList.remove("hidden");
-}
-
-/** -------------------------
- *  Chapter + Verse Rendering
--------------------------- */
-function renderChapterButtons(mode, bookData) {
-  const chaptersCount = bookData.chapters.length;
-
-  if (mode === "desktop") {
-    const wrap = $("d-chapters");
-    wrap.innerHTML = "";
-    for (let i = 1; i <= chaptersCount; i++) {
-      const b = document.createElement("button");
-      b.className = "chapter-btn";
-      b.textContent = i;
-      b.addEventListener("click", () => setChapter("desktop", i));
-      wrap.appendChild(b);
-    }
-  } else {
-    const wrap = $("m-chapters");
-    wrap.innerHTML = "";
-    for (let i = 1; i <= chaptersCount; i++) {
-      const b = document.createElement("button");
-      b.className = "chapter-btn text-xs";
-      b.textContent = i;
-      b.addEventListener("click", () => setChapter("mobile", i));
-      wrap.appendChild(b);
-    }
-  }
-
-  // set active UI
-  setActiveChapterButton(mode, 1);
-}
-
-function setActiveChapterButton(mode, chap) {
-  const selector = mode === "desktop" ? "#d-chapters .chapter-btn" : "#m-chapters .chapter-btn";
-  document.querySelectorAll(selector).forEach((btn, idx) => {
-    btn.classList.toggle("active", (idx + 1) === chap);
-  });
-}
-
-async function setChapter(mode, chap) {
-  const bookData = bookTextCache.get(currentBook.bookNum);
-  if (!bookData) return;
-
-  currentChapter = chap;
-  setActiveChapterButton(mode, chap);
-
-  const verses = bookData.chapters[chap - 1] || [];
-
-  // Verse list (left)
-  const listEl = mode === "desktop" ? $("d-verse-list") : $("m-verse-list");
-  listEl.innerHTML = "";
-  if (!verses.length) {
-    listEl.innerHTML = `<p class="text-xs text-gray-500 text-center">இந்த அதிகாரத்தில் data இல்லை</p>`;
-  } else {
-    verses.forEach(v => {
-      const li = document.createElement("div");
-      li.className = "verse-li";
-      li.innerHTML = `<span class="text-xs font-bold text-blue-600">${v.v}</span> <span class="text-xs text-gray-700">${escapeHtml(shortText(v.t, 60))}</span>`;
-      li.addEventListener("click", () => scrollToVerse(mode, v.v));
-      listEl.appendChild(li);
-    });
-  }
-
-  // Verse container (right)
-  const container = mode === "desktop" ? $("d-verse-container") : $("m-verse-container");
-  container.innerHTML = "";
-  if (!verses.length) {
-    container.innerHTML = `<p class="text-gray-500 text-center text-base">வசனங்கள் இங்கே வெளிப்படும்</p>`;
-  } else {
-    verses.forEach(v => {
-      const line = document.createElement("div");
-      line.className = "verse-line";
-      line.id = `${mode}-verse-${v.v}`;
-      line.innerHTML = `<span class="verse-num">${v.v}</span><span class="verse-text">${escapeHtml(v.t)}</span>`;
-      container.appendChild(line);
-    });
-  }
-
-  // Header
-  if (mode === "desktop") {
-    $("d-verse-header").textContent = `${currentBook.name_ta} ${chap}`;
-    $("d-data-status").textContent = `Loaded: Book #${bookData.bookNum} | Chapters: ${bookData.chapters.length} | Chapter: ${chap}`;
-  } else {
-    $("m-data-status").textContent = `Loaded: Book #${bookData.bookNum} | Chapters: ${bookData.chapters.length} | Chapter: ${chap}`;
-  }
-}
-
-function scrollToVerse(mode, verseNum) {
-  const el = $(`${mode}-verse-${verseNum}`);
-  if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-/** -------------------------
- *  Highlighter (safer than surroundContents)
--------------------------- */
-function toggleHighlighter(mode) {
-  if (mode === "desktop") {
-    highlightModeDesktop = !highlightModeDesktop;
-    $("d-highlighter-toolbar").classList.toggle("hidden", !highlightModeDesktop);
-    $("d-toggle-highlighter").classList.toggle("bg-yellow-200", highlightModeDesktop);
-    $("d-toggle-highlighter").classList.toggle("text-yellow-900", highlightModeDesktop);
-
-    const container = $("d-verse-container");
-    container.style.cursor = highlightModeDesktop ? "text" : "auto";
-  } else {
-    highlightModeMobile = !highlightModeMobile;
-    $("m-highlighter-toolbar").classList.toggle("hidden", !highlightModeMobile);
-
-    const container = $("m-verse-container");
-    container.style.cursor = highlightModeMobile ? "text" : "auto";
-  }
-}
-
-function applyHighlightIfEnabled(mode) {
-  const enabled = mode === "desktop" ? highlightModeDesktop : highlightModeMobile;
-  if (!enabled) return;
-
-  const sel = window.getSelection();
-  if (!sel || sel.toString().trim().length === 0) return;
-
-  // Must be inside verse container
-  const container = mode === "desktop" ? $("d-verse-container") : $("m-verse-container");
-  const range = sel.getRangeAt(0);
-
-  if (!container.contains(range.commonAncestorContainer)) return;
-
-  try {
-    const span = document.createElement("span");
-    span.style.backgroundColor = highlightColor;
-    span.style.padding = "2px 4px";
-    span.style.borderRadius = "4px";
-
-    // safer: extract contents and wrap
-    const frag = range.extractContents();
-    span.appendChild(frag);
-    range.insertNode(span);
-    sel.removeAllRanges();
-  } catch (e) {
-    // If selection crosses complex nodes, we fail safely
-    sel.removeAllRanges();
-    alert("Highlight failed. Try selecting within one verse line.");
-  }
-}
-
-function clearHighlights(mode) {
-  const container = mode === "desktop" ? $("d-verse-container") : $("m-verse-container");
-  // remove highlight spans by replacing with text nodes
-  const spans = container.querySelectorAll("span[style*='background-color']");
-  spans.forEach(s => {
-    const text = document.createTextNode(s.textContent);
-    s.parentNode.replaceChild(text, s);
-  });
-}
-
-/** Color dots */
-function bindHighlighterColors() {
-  document.querySelectorAll(".hl-dot").forEach(btn => {
-    btn.addEventListener("click", () => {
-      highlightColor = btn.dataset.color || "#FDE047";
-    });
-  });
-}
-
-/** -------------------------
- *  BIO SEARCH (Local now, API later)
--------------------------- */
-async function bioSearch(query, mode) {
-  const q = (query || "").trim();
-  if (!q) return;
-
-  const resultBox = mode === "desktop" ? $("d-bio-result") : $("m-bio-result");
-  const titleEl = mode === "desktop" ? $("d-bio-title") : $("m-bio-title");
-  const textEl = mode === "desktop" ? $("d-bio-text") : $("m-bio-text");
-  const versesEl = mode === "desktop" ? $("d-bio-verses") : $("m-bio-verses");
-
-  resultBox.classList.remove("hidden");
-  titleEl.textContent = "Bio";
-  textEl.textContent = "தேடிக்கொண்டிருக்கிறோம்...";
-  versesEl.textContent = "";
-
-  // If you add backend later:
-  if (BIO_API_URL) {
+async function fetchFirstJSON(paths) {
+  let last;
+  for (const p of paths) {
     try {
-      const res = await fetch(BIO_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q })
-      });
-      const data = await res.json();
-      textEl.textContent = data.bio || "தகவல் இல்லை.";
-      versesEl.textContent = data.verses ? `Verses: ${data.verses.join(", ")}` : "";
-      return;
-    } catch {
-      // fallback to local
-    }
+      const r = await fetch(p, { cache:"no-store" });
+      if (!r.ok) { last = new Error(`HTTP ${r.status}: ${p}`); continue; }
+      return { json: await r.json(), path: p };
+    } catch(e) { last = e; }
   }
-
-  // LOCAL MODE:
-  // Put bios in ./data/bios.json like:
-  // { "தாவீது": { "bio":"...", "verses":["சங் 23:1","1 சாமு 16:13"] }, ... }
-  const local = await loadLocalBios();
-  const hit = local[q] || local[normalizeKey(q)];
-  if (hit) {
-    titleEl.textContent = q;
-    textEl.textContent = hit.bio || "Bio இல்லை.";
-    versesEl.textContent = hit.verses?.length ? `குறிப்பு வசனங்கள்: ${hit.verses.join(", ")}` : "இந்த பெயருக்கு verse index இல்லை.";
-  } else {
-    titleEl.textContent = q;
-    textEl.textContent = `"${q}" பற்றி தகவல் கிடைக்கவில்லை.`;
-    versesEl.textContent = "Tip: data/bios.json ல add பண்ணலாம் அல்லது பின்னாடி LLM API இணைக்கலாம்.";
-  }
+  throw last || new Error("No JSON path worked.");
 }
 
-let localBiosCache = null;
-async function loadLocalBios() {
-  if (localBiosCache) return localBiosCache;
-  try {
-    const res = await fetch("./data/bios.json");
-    if (!res.ok) throw new Error();
-    localBiosCache = await res.json();
-    return localBiosCache;
-  } catch {
-    localBiosCache = {
-      "தாவீது": { bio: "தாவீது இஸ்ரவேலின் ராஜா; சங்கீதங்களை எழுதியவர் என்று பல இடங்களில் குறிப்பிடப்படுகிறார்.", verses: ["சங்கீதம் 23:1", "1 சாமுவேல் 16:13"] },
-      "மோசே": { bio: "மோசே எகிப்திலிருந்து இஸ்ரவேலை விடுவிக்க இறைவனால் தேர்ந்தெடுக்கப்பட்ட தலைவர்.", verses: ["விடுதலைப் பயணம் 3:10", "விடுதலைப் பயணம் 14:21"] },
-      "பவுல்": { bio: "திருத்தூதர் பவுல் புதிய ஏற்பாட்டில் பல கடிதங்களை எழுதியவர்.", verses: ["திருத்தூதர் பணிகள் 9:15", "உரோமையர் 1:1"] }
-    };
-    return localBiosCache;
-  }
-}
-
-/** -------------------------
- *  SONG SEARCH (Placeholder)
--------------------------- */
-let songsCache = null;
-async function loadSongs() {
-  if (songsCache) return songsCache;
-  try {
-    const res = await fetch(SONGS_JSON_PATH);
-    if (!res.ok) throw new Error();
-    songsCache = await res.json();
-    return songsCache;
-  } catch {
-    songsCache = [
-      { title: "Sample Song 1", lyrics: "அருளால் நிறைந்த பாடல்...", tags: ["worship"] },
-      { title: "Sample Song 2", lyrics: "கர்த்தரைப் புகழ்வோம்...", tags: ["praise"] }
-    ];
-    return songsCache;
-  }
-}
-
-async function renderSongResults(targetId, query) {
-  const wrap = $(targetId);
-  const statusId = targetId === "d-song-results" ? "d-song-status" : "m-song-status";
-  $(statusId).textContent = "Searching...";
-
-  const q = (query || "").trim().toLowerCase();
-  const songs = await loadSongs();
-
-  const results = !q
-    ? songs.slice(0, 10)
-    : songs.filter(s =>
-        (s.title || "").toLowerCase().includes(q) ||
-        (s.lyrics || "").toLowerCase().includes(q) ||
-        (s.tags || []).join(" ").toLowerCase().includes(q)
-      );
-
-  wrap.innerHTML = "";
-  if (!results.length) {
-    wrap.innerHTML = `<div class="text-sm text-gray-600">No songs found.</div>`;
-    $(statusId).textContent = "0 results";
-    return;
-  }
-
-  results.slice(0, 20).forEach(s => {
-    const card = document.createElement("div");
-    card.className = "bg-gray-50 border border-gray-200 rounded-2xl p-4";
-    card.innerHTML = `
-      <div class="font-bold text-gray-800">${escapeHtml(s.title || "Untitled")}</div>
-      <div class="text-xs text-gray-500 mt-1">${escapeHtml((s.tags || []).join(", "))}</div>
-      <div class="text-sm text-gray-700 mt-3 whitespace-pre-line">${escapeHtml(shortText(s.lyrics || "", 400))}</div>
-    `;
-    wrap.appendChild(card);
-  });
-
-  $(statusId).textContent = `${results.length} results`;
-}
-
-/** -------------------------
- *  RANDOM VERSE
--------------------------- */
-async function setRandomVerseDesktop() {
-  const outText = $("verse-text");
-  const outRef = $("verse-reference");
-  const status = $("random-verse-status");
-
-  status.textContent = "Loading random verse...";
-  const pick = await pickRandomVerse();
-  if (!pick) {
-    status.textContent = "Random verse failed (data missing). Check JSON path.";
-    outText.textContent = "—";
-    outRef.textContent = "—";
-    return;
-  }
-
-  outText.textContent = `"${pick.text}"`;
-  outRef.textContent = `— ${pick.ref}`;
-  status.textContent = "";
-}
-
-async function setRandomVerseMobile() {
-  const outText = $("m-verse-text");
-  const outRef = $("m-verse-ref");
-  const status = $("m-random-verse-status");
-
-  status.textContent = "Loading...";
-  const pick = await pickRandomVerse();
-  if (!pick) {
-    status.textContent = "Random verse failed. JSON path சரிபார்க்கவும்.";
-    outText.textContent = "—";
-    outRef.textContent = "—";
-    return;
-  }
-
-  outText.textContent = `"${pick.text}"`;
-  outRef.textContent = `— ${pick.ref}`;
-  status.textContent = "";
-}
-
-async function pickRandomVerse() {
-  // If we already loaded some book data, use it
-  const cachedBooks = Array.from(bookTextCache.values());
-  if (cachedBooks.length) {
-    const b = cachedBooks[Math.floor(Math.random() * cachedBooks.length)];
-    return randomVerseFromBook(b);
-  }
-
-  // Otherwise load a random book from list
-  if (!allBooksFlat.length) return null;
-  const randomBook = allBooksFlat[Math.floor(Math.random() * allBooksFlat.length)];
-  const data = await ensureBookLoaded(randomBook.bookNum, "desktop", true);
-  if (!data) return null;
-  return randomVerseFromBook(data);
-}
-
-function randomVerseFromBook(bookData) {
-  const chapIndex = Math.floor(Math.random() * bookData.chapters.length);
-  const chap = bookData.chapters[chapIndex] || [];
-  if (!chap.length) return null;
-
-  const verse = chap[Math.floor(Math.random() * chap.length)];
-  const name = bookData.name_ta || `Book ${bookData.bookNum}`;
-  return {
-    text: verse.t,
-    ref: `${name} ${chapIndex + 1}:${verse.v}`
+/* =========================================================
+   NORMALIZER
+========================================================= */
+function normalizeBookJSON(raw) {
+  const map = new Map();
+  const add = (ch,v,t) => {
+    const c=Number(ch), vn=Number(v), text=(t??"").toString().trim();
+    if (!c||!vn||!text) return;
+    if (!map.has(c)) map.set(c,[]);
+    map.get(c).push({v:vn, t:text});
   };
-}
 
-/** -------------------------
- *  DATA LOADING (Fix for "No data showing")
- *  We try multiple file paths + multiple JSON shapes
--------------------------- */
-async function ensureBookLoaded(bookNum, mode, silent = false) {
-  if (bookTextCache.has(bookNum)) return bookTextCache.get(bookNum);
+  const roots = [raw?.BIBLE_TEXT,raw?.bible_text,raw?.text,raw?.data,
+                 raw?.verses,raw?.chapters,raw?.Chapters,raw?.chapter,raw?.Chapter]
+    .filter(Boolean);
+  if (!roots.length) roots.push(raw);
 
-  const statusEl = mode === "desktop" ? $("d-data-status") : $("m-data-status");
-  if (!silent) statusEl.textContent = `Loading data for Book #${bookNum}...`;
-
-  // 1) try combined bible file if you have (optional)
-  // If you later place: ./data/tamil_rc_75.json (big file), uncomment:
-  // const combined = await tryLoadCombinedBible();
-  // if (combined) { ... }
-
-  // 2) try per-book JSON files in common paths
-  const candidatePaths = [
-    `./data/ot/${bookNum}.json`,
-    `./data/nt/${bookNum}.json`,
-    `./data/${bookNum}.json`,
-    `./data/book_${bookNum}.json`,
-    `./data/book${bookNum}.json`,
-    `./data/books/${bookNum}.json`,
-    `./data/books/book_${bookNum}.json`,
-  ];
-
-  let raw = null;
-  let usedPath = null;
-
-  for (const p of candidatePaths) {
-    try {
-      const res = await fetch(p);
-      if (!res.ok) continue;
-      raw = await res.json();
-      usedPath = p;
-      break;
-    } catch {
-      // continue
-    }
-  }
-
-  if (!raw) {
-    if (!silent) {
-      statusEl.textContent =
-        `❌ Data load failed for Book #${bookNum}. Tried: ${candidatePaths.join(" | ")}.
-Fix: data folder path/name mismatch.`;
-    }
-    return null;
-  }
-
-  const normalized = normalizeBookJson(raw, bookNum);
-  normalized.name_ta = currentBook?.name_ta || normalized.name_ta || `Book ${bookNum}`;
-  bookTextCache.set(bookNum, normalized);
-
-  if (!silent) statusEl.textContent = `✅ Loaded Book #${bookNum} from ${usedPath} | chapters: ${normalized.chapters.length}`;
-  return normalized;
-}
-
-/**
- * Tries to normalize many possible JSON shapes into:
- * { bookNum, name_ta, chapters: [ [ {v,t}, ...], ... ] }
- */
-function normalizeBookJson(raw, bookNum) {
-  // Already normalized?
-  if (raw && Array.isArray(raw.chapters)) {
-    return {
-      bookNum: raw.bookNum ?? bookNum,
-      name_ta: raw.name_ta ?? raw.name ?? "",
-      chapters: raw.chapters.map((ch, idx) => normalizeChapter(ch, idx + 1))
-    };
-  }
-
-  // Shape A: { "1": { "1": "text", "2":"text" }, "2": {...} }  (chapters as keys)
-  if (raw && typeof raw === "object" && hasChapterKeys(raw)) {
-    const chapterNums = Object.keys(raw).map(Number).filter(n => !Number.isNaN(n)).sort((a,b)=>a-b);
-    const chapters = chapterNums.map(cn => normalizeChapter(raw[String(cn)], cn));
-    return { bookNum, name_ta: raw.name_ta || raw.name || "", chapters };
-  }
-
-  // Shape B: array of verses with chapter field: [{chapter:1,verse:1,text:""}, ...]
-  if (Array.isArray(raw) && raw.length && (raw[0].chapter || raw[0].Chapter)) {
-    const byChap = new Map();
-    raw.forEach(r => {
-      const c = Number(r.chapter ?? r.Chapter);
-      const v = Number(r.verse ?? r.Verse);
-      const t = String(r.text ?? r.t ?? r.verseText ?? "");
-      if (!byChap.has(c)) byChap.set(c, []);
-      byChap.get(c).push({ v, t });
-    });
-    const chNums = Array.from(byChap.keys()).sort((a,b)=>a-b);
-    const chapters = chNums.map(c => byChap.get(c).sort((a,b)=>a.v-b.v));
-    return { bookNum, name_ta: "", chapters };
-  }
-
-  // Shape C: { chapters: { "1":[...], "2":[...] } }
-  if (raw && raw.chapters && typeof raw.chapters === "object" && !Array.isArray(raw.chapters)) {
-    const chNums = Object.keys(raw.chapters).map(Number).filter(n => !Number.isNaN(n)).sort((a,b)=>a-b);
-    const chapters = chNums.map(c => normalizeChapter(raw.chapters[String(c)], c));
-    return { bookNum, name_ta: raw.name_ta || raw.name || "", chapters };
-  }
-
-  // Fallback: try to interpret raw as a single chapter array
-  if (Array.isArray(raw)) {
-    return { bookNum, name_ta: "", chapters: [ normalizeChapter(raw, 1) ] };
-  }
-
-  // Last fallback: empty
-  return { bookNum, name_ta: "", chapters: [] };
-}
-
-function hasChapterKeys(obj) {
-  // if keys contain many numeric strings like "1","2","3"
-  const keys = Object.keys(obj);
-  const numeric = keys.filter(k => String(Number(k)) === k);
-  return numeric.length >= 2;
-}
-
-function normalizeChapter(ch, chapNum) {
-  // If array: could be ["text1","text2"] or [{v:1,t:""}] etc.
-  if (Array.isArray(ch)) {
-    if (ch.length && typeof ch[0] === "string") {
-      return ch.map((t, i) => ({ v: i + 1, t: String(t) }));
-    }
-    if (ch.length && typeof ch[0] === "object") {
-      return ch.map((x, i) => ({
-        v: Number(x.v ?? x.verse ?? x.Verse ?? (i + 1)),
-        t: String(x.t ?? x.text ?? x.verseText ?? "")
-      })).sort((a,b)=>a.v-b.v);
-    }
-    return [];
-  }
-
-  // If object mapping: { "1":"text", "2":"text" }
-  if (ch && typeof ch === "object") {
-    const vNums = Object.keys(ch).map(Number).filter(n => !Number.isNaN(n)).sort((a,b)=>a-b);
-    return vNums.map(v => ({ v, t: String(ch[String(v)] ?? "") }));
-  }
-
-  return [];
-}
-
-/** -------------------------
- *  Helpers
--------------------------- */
-function escapeHtml(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function shortText(s, n) {
-  const t = String(s || "");
-  if (t.length <= n) return t;
-  return t.slice(0, n - 1) + "…";
-}
-
-function normalizeKey(s) {
-  return String(s || "").trim();
-}
-
-/** -------------------------
- *  Bind Events
--------------------------- */
-function bindEvents() {
-  // Desktop nav
-  document.querySelectorAll("[data-dnav]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const key = btn.dataset.dnav;
-      showDesktopScreen(key);
-      if (key === "read") {
-        // just show book lists; reader is hidden until book click
-        $("d-reader").classList.add("hidden");
+  for (const root of roots) {
+    if (Array.isArray(root)&&root.length&&typeof root[0]==="object"&&!Array.isArray(root[0])) {
+      let hit=0;
+      for (const row of root) {
+        const ch=row.chapter??row.ch??row.c??row.Chapter;
+        const v =row.verse??row.v??row.vn??row.Verse;
+        const t =row.text??row.t??row.value??row.verseText??row.VerseText;
+        if (ch&&v&&t) { add(ch,v,t); hit++; }
       }
+      if (hit) break;
+    }
+    if (Array.isArray(root)&&root.length&&Array.isArray(root[0])) {
+      let hit=0;
+      root.forEach((arr,i) => arr.forEach((vt,j) => {
+        if (typeof vt==="string"&&vt.trim()) { add(i+1,j+1,vt); hit++; }
+      }));
+      if (hit) break;
+    }
+    if (root&&typeof root==="object"&&!Array.isArray(root)) {
+      const tryChapObj = obj => {
+        const keys=Object.keys(obj).filter(k=>/^\d+$/.test(k));
+        if (!keys.length) return 0;
+        let hit=0;
+        for (const ck of keys) {
+          const cv=obj[ck];
+          if (Array.isArray(cv)) {
+            cv.forEach((item,idx) => {
+              if (typeof item==="string"&&item.trim()) { add(ck,idx+1,item); hit++; }
+              else if (item&&typeof item==="object") {
+                if (item.type==="V"&&item.text) { add(ck,item.v??(idx+1),item.text); hit++; }
+                else { const v=item.verse??item.v??(idx+1); const t=item.text??item.t??item.value; if(t){add(ck,v,t);hit++;} }
+              }
+            });
+          } else if (cv&&typeof cv==="object") {
+            const vkeys=Object.keys(cv).filter(k=>/^\d+$/.test(k));
+            if (vkeys.length) { vkeys.forEach(vk=>add(ck,vk,cv[vk])); hit+=vkeys.length; }
+            else if (Array.isArray(cv.verses)) {
+              cv.verses.forEach((row,idx)=>{ const v=row.verse??row.v??(idx+1); const t=row.text??row.t??row.value; if(t){add(ck,v,t);hit++;} });
+            }
+          }
+        }
+        return hit;
+      };
+      let hit = tryChapObj(root);
+      if (!hit && root.chapters) hit = tryChapObj(root.chapters);
+      if (hit) break;
+    }
+  }
+
+  for (const [ch,list] of map.entries()) list.sort((a,b)=>a.v-b.v);
+  const chapterCount = Math.max(0, ...Array.from(map.keys()));
+  return { versesByChapter: map, chapterCount };
+}
+
+async function loadBook(bookNum) {
+  if (bookCache.has(bookNum)) return bookCache.get(bookNum);
+  const { json, path } = await fetchFirstJSON(buildCandidatePaths(bookNum));
+  const norm = normalizeBookJSON(json);
+  const payload = { raw:json, ...norm, sourcePath:path };
+  bookCache.set(bookNum, payload);
+  return payload;
+}
+
+/* =========================================================
+   SAINT OF THE DAY — mock data (replace with real API later)
+========================================================= */
+const SAINTS = [
+  { name:"புனித பாட்ரிக்", date:"March 17 · Feast Day", about:"அயர்லாந்தின் பாதுகாவலர். அவர் கிரேக்கோ-ரோமன் கிறிஸ்தவ கலாச்சாரத்தை அயர்லாந்துக்கு கொண்டு வந்தார். அவரது விசுவாசம் மலைகளையும் சாதனைகளையும் தாண்டியது.", actions:["ஆயிரக்கணக்கான மக்களை திருமுழுக்காட்டினார்","கடத்தப்பட்டு அடிமையாக வாழ்ந்தார், பின் மீண்டார்","அயர்லாந்தில் பல தேவாலயங்கள் நிறுவினார்"] },
+  { name:"புனித ஜோசப்", date:"March 19 · Feast Day", about:"இயேசுவின் வளர்ப்பு தந்தை. நம்பகமான பாதுகாவலர், கைவேலையாளர். கடவுளின் திட்டத்தில் மறைவான ஆனால் மிக முக்கியமான பாத்திரம்.", actions:["மரியாள் மற்றும் இயேசுவை பாதுகாத்தார்","எகிப்துக்கு தப்பி ஓடினார்","நம்பகமான கைவேலையாளர்"] },
+  { name:"புனித தெரேசா", date:"October 1 · Feast Day", about:"சிறிய பூக்களின் புனிதர். சிறிய வழியில் கடவுளை நோக்கி நடந்தார். அன்பின் மூலம் பரலோகம் வரை செல்லும் பாதை காட்டினார்.", actions:["அன்பின் சிறிய வழியை போதித்தார்","மிஷனரிகளுக்கு பிரார்த்தித்தார்","இளமையிலேயே வீரத்துடன் இறந்தார்"] },
+];
+
+function loadSaintOfDay() {
+  const today = new Date().getDay();
+  const s = SAINTS[today % SAINTS.length];
+  setText("saintName", s.name);
+  setText("saintDate", s.date);
+  setText("saintAbout", s.about);
+  const actionsEl = $("saintActions");
+  if (actionsEl) {
+    actionsEl.innerHTML = s.actions.map(a =>
+      `<span class="saint-action-pill">${escapeHTML(a)}</span>`
+    ).join("");
+  }
+}
+
+/* =========================================================
+   BOOK LISTS
+========================================================= */
+function bookRowHTML({ serial, name, chapters, bookNum, testament }) {
+  return `
+  <div class="book-row book-row-${bookNum}">
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-extrabold flex-shrink-0">${serial}</span>
+          <div class="font-extrabold text-gray-800 truncate text-sm">${escapeHTML(name)}</div>
+        </div>
+        <div class="text-xs text-gray-400 mt-0.5 ml-10">அதிகாரங்கள்: ${chapters ?? "…"}</div>
+      </div>
+      <button data-open="${bookNum}" data-testament="${testament}"
+              class="px-3 py-1.5 rounded-2xl bg-blue-100 text-blue-700 font-extrabold text-xs flex-shrink-0">
+        Open
+      </button>
+    </div>
+  </div>`;
+}
+
+async function renderBookLists() {
+  const otBooks = [...booksOrder.old_testament, ...booksOrder.deuterocanon];
+  const ntBooks = [...booksOrder.new_testament];
+
+  $("otList").innerHTML = otBooks.map((b,i) => bookRowHTML({ serial:i+1, name:b.name_ta, chapters:"…", bookNum:b.bookNum, testament:"ot" })).join("");
+  $("ntList").innerHTML = ntBooks.map((b,i) => bookRowHTML({ serial:i+1, name:b.name_ta, chapters:"…", bookNum:b.bookNum, testament:"nt" })).join("");
+
+  document.querySelectorAll("[data-open]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const bookNum = Number(btn.dataset.open);
+      const testament = btn.dataset.testament;
+      const list = testament === "ot" ? otBooks : ntBooks;
+      const idx = list.findIndex(x => x.bookNum === bookNum);
+      const name_ta = list[idx]?.name_ta ?? `Book ${bookNum}`;
+      ttsStop();
+      await openReader({ bookNum, name_ta, testament, serial: idx >= 0 ? idx+1 : bookNum });
+      go("reader");
     });
   });
 
-  // Mobile tabs
-  document.querySelectorAll(".mobile-tab").forEach(tab => {
-    tab.addEventListener("click", () => showMobileScreen(tab.dataset.mtab));
+  [...otBooks, ...ntBooks].forEach(async b => {
+    try { const p = await loadBook(b.bookNum); updateChapterCountUI(b.bookNum, p.chapterCount); }
+    catch { updateChapterCountUI(b.bookNum, 0); }
   });
-
-  // Back buttons
-  $("d-back-books").addEventListener("click", backToBooksDesktop);
-  $("m-back-books").addEventListener("click", backToBooksMobile);
-
-  // Font size
-  $("font-decrease").addEventListener("click", () => {
-    if (currentFontSize > 12) {
-      currentFontSize -= 2;
-      document.body.style.fontSize = currentFontSize + "px";
-    }
-  });
-  $("font-increase").addEventListener("click", () => {
-    if (currentFontSize < 24) {
-      currentFontSize += 2;
-      document.body.style.fontSize = currentFontSize + "px";
-    }
-  });
-
-  // Highlighter toggles
-  $("d-toggle-highlighter").addEventListener("click", () => toggleHighlighter("desktop"));
-  $("m-toggle-highlighter").addEventListener("click", () => toggleHighlighter("mobile"));
-
-  // Highlighter apply on mouseup
-  $("d-verse-container").addEventListener("mouseup", () => applyHighlightIfEnabled("desktop"));
-  $("m-verse-container").addEventListener("mouseup", () => applyHighlightIfEnabled("mobile"));
-
-  // Clear highlights
-  $("d-clear-highlights").addEventListener("click", () => clearHighlights("desktop"));
-  $("m-clear-highlights").addEventListener("click", () => clearHighlights("mobile"));
-
-  bindHighlighterColors();
-
-  // Bio search
-  $("d-bio-search").addEventListener("click", () => bioSearch($("d-bio-q").value, "desktop"));
-  $("d-bio-q").addEventListener("keypress", (e) => { if (e.key === "Enter") bioSearch($("d-bio-q").value, "desktop"); });
-
-  $("m-bio-search").addEventListener("click", () => bioSearch($("m-bio-q").value, "mobile"));
-  $("m-bio-q").addEventListener("keypress", (e) => { if (e.key === "Enter") bioSearch($("m-bio-q").value, "mobile"); });
-
-  // Random verse
-  $("random-verse-btn").addEventListener("click", setRandomVerseDesktop);
-  $("m-random-verse-btn").addEventListener("click", setRandomVerseMobile);
-
-  // Songs
-  $("d-song-search").addEventListener("click", () => renderSongResults("d-song-results", $("d-song-q").value));
-  $("m-song-search").addEventListener("click", () => renderSongResults("m-song-results", $("m-song-q").value));
-  $("d-song-stt").addEventListener("click", () => alert("STT placeholder: Web Speech API later."));
-  $("m-song-stt").addEventListener("click", () => alert("STT placeholder: Web Speech API later."));
 }
 
-/** -------------------------
- *  INIT
--------------------------- */
-async function init() {
-  bindEvents();
+function updateChapterCountUI(bookNum, count) {
+  const row = document.querySelector(`.book-row-${bookNum}`);
+  if (!row) return;
+  const line = row.querySelector(".text-xs.text-gray-400");
+  if (line) line.textContent = `அதிகாரங்கள்: ${count || 0}`;
+}
 
-  // Default screens
-  showDesktopScreen("home");
-  showMobileScreen("m-home");
+/* =========================================================
+   READER
+========================================================= */
+function clearReaderError() { hide("readerError"); setText("readerError",""); }
+function showReaderError(msg) { setText("readerError","❌ "+msg); show("readerError"); }
 
-  // Load books
+async function openReader(book) {
+  clearReaderError();
+  currentBook = book; currentChapter = 1;
   try {
-    await loadBooksOrder();
-  } catch (e) {
-    console.error(e);
-    $("d-ot-count").textContent = "books_order.json error";
-    $("m-ot-count").textContent = "books_order.json error";
+    const p = await loadBook(book.bookNum);
+    $("debugBox").innerHTML = [
+      `Book: ${book.name_ta} (#${book.bookNum})`,
+      `Source: ${p.sourcePath}`,
+      `Chapters: ${p.chapterCount}`,
+      `Keys: ${p.raw && typeof p.raw === "object" ? Object.keys(p.raw).slice(0,12).join(", ") : "(array)"}`
+    ].join("<br>");
+    if (!p.chapterCount) showReaderError("Chapter data கிடைக்கவில்லை.");
+    setText("bookMeta", `${book.name_ta} · ${p.chapterCount || 0} அதிகாரங்கள்`);
+    renderChapters(p.chapterCount || 0);
+    await renderChapter(1);
+  } catch(e) { showReaderError(String(e?.message||e)); }
+}
+
+function renderChapters(count) {
+  const target = $("chapters");
+  if (!target) return;
+  if (!count) { target.innerHTML = `<div class="text-sm text-gray-400">—</div>`; return; }
+  target.innerHTML = Array.from({length:count}, (_,i) => i+1).map(c =>
+    `<button class="chapter-btn ${c===1?"active":""}" data-ch="${c}">${c}</button>`
+  ).join("");
+  target.querySelectorAll("[data-ch]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const ch = Number(btn.dataset.ch);
+      currentChapter = ch; ttsStop();
+      target.querySelectorAll(".chapter-btn").forEach(x => x.classList.remove("active"));
+      btn.classList.add("active");
+      await renderChapter(ch);
+    });
+  });
+}
+
+async function renderChapter(ch) {
+  clearReaderError();
+  const p = await loadBook(currentBook.bookNum);
+  const verses = p.versesByChapter.get(ch) || [];
+  ttsVerses = verses; ttsCurrentIdx = 0;
+
+  setText("chapterTitle", `${currentBook.name_ta} ${ch}`);
+  setText("readingTitle", `${currentBook.name_ta} ${ch} அதிகாரம்`);
+  setText("audioChapterLabel", `${currentBook.name_ta} அதிகாரம் ${ch}`);
+
+  if (ttsSupported && verses.length) { show("audioPlayer"); ttsUpdateUI(); }
+  else hide("audioPlayer");
+
+  renderVerseChips(verses);
+
+  const box = $("verseBox");
+  if (box) {
+    box.innerHTML = verses.length
+      ? verses.map(v => `
+          <p class="verse-para" id="vb-${v.v}" data-v="${v.v}">
+            <span class="font-extrabold text-blue-600 mr-2 select-none">${v.v}</span><span class="verse-text">${escapeHTML(v.t)}</span>
+          </p>`).join("")
+      : `<div class="text-gray-400 text-center mt-10">இந்த அதிகாரத்தில் data இல்லை</div>`;
   }
 
-  // Set initial random verse
-  setRandomVerseDesktop();
-  setRandomVerseMobile();
-
-  // Render empty songs
-  renderSongResults("d-song-results", "");
-  renderSongResults("m-song-results", "");
+  setText("audioVerseCounter", `0 / ${verses.length} வசனங்கள்`);
+  updateProgressBar(0, verses.length);
+  setupHighlighter();
 }
 
-init();
+function renderVerseChips(verses) {
+  const c = $("verseChips");
+  if (!c) return;
+  if (!verses.length) { c.innerHTML = `<span class="text-xs text-gray-400">வசனங்கள் இல்லை</span>`; return; }
+  // Use verse's actual .v number to avoid duplicates
+  const seen = new Set();
+  const chips = verses.filter(v => { if(seen.has(v.v)) return false; seen.add(v.v); return true; });
+  c.innerHTML = chips.map(v =>
+    `<button class="verse-chip" id="vc-${v.v}" data-v="${v.v}">${v.v}</button>`
+  ).join("");
+  c.querySelectorAll("[data-v]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const vNum = Number(btn.dataset.v);
+      $(`vb-${vNum}`)?.scrollIntoView({ behavior:"smooth", block:"center" });
+      if (ttsPlaying || ttsPaused) ttsJumpToVerse(vNum);
+    });
+  });
+}
+
+/* =========================================================
+   TTS
+========================================================= */
+function ttsInit() {
+  if (!("speechSynthesis" in window)) { ttsSupported=false; return; }
+  ttsSupported = true;
+  const tryVoice = () => { if(speechSynthesis.getVoices().length) ttsUpdateVoiceInfo(); };
+  speechSynthesis.addEventListener("voiceschanged", tryVoice);
+  tryVoice();
+}
+
+function ttsGetTamilVoice() {
+  const v = speechSynthesis.getVoices();
+  return v.find(x=>x.lang==="ta-IN") || v.find(x=>x.lang.startsWith("ta")) || v.find(x=>x.name.toLowerCase().includes("tamil")) || null;
+}
+
+function ttsUpdateVoiceInfo() {
+  const voice = ttsGetTamilVoice();
+  const el = $("audioVoiceInfo");
+  if (!el) return;
+  if (voice) { el.textContent=`🎙 ${voice.name}`; el.style.color="rgba(52,211,153,0.9)"; }
+  else { el.textContent="⚠ Windows Settings → Speech → Add Tamil voice"; el.style.color="rgba(251,191,36,0.9)"; }
+}
+
+function ttsHighlightVerse(idx) {
+  document.querySelectorAll(".verse-para").forEach(e=>e.classList.remove("tts-active"));
+  document.querySelectorAll(".verse-chip").forEach(e=>e.classList.remove("tts-active-chip"));
+  if (idx<0||idx>=ttsVerses.length) return;
+  const v = ttsVerses[idx];
+  $(`vb-${v.v}`)?.classList.add("tts-active");
+  $(`vb-${v.v}`)?.scrollIntoView({behavior:"smooth",block:"center"});
+  $(`vc-${v.v}`)?.classList.add("tts-active-chip");
+  $(`vc-${v.v}`)?.scrollIntoView({behavior:"nearest"});
+  setText("audioVerseCounter", `${idx+1} / ${ttsVerses.length} வசனங்கள்`);
+  updateProgressBar(idx+1, ttsVerses.length);
+}
+
+function updateProgressBar(cur, total) {
+  const f = $("audioProgressFill");
+  if (f) f.style.width = total>0 ? `${Math.round((cur/total)*100)}%` : "0%";
+}
+
+function ttsSpeakVerse(idx) {
+  if (idx >= ttsVerses.length) { ttsStop(); setText("audioStatusText","அதிகாரம் முடிந்தது ✓"); return; }
+  ttsCurrentIdx = idx;
+  ttsHighlightVerse(idx);
+  const utt = new SpeechSynthesisUtterance(ttsVerses[idx].t);
+  const voice = ttsGetTamilVoice();
+  if (voice) utt.voice = voice;
+  utt.lang="ta-IN"; utt.rate=_ttsRate; utt.pitch=1.0;
+  utt.onend = () => { if(ttsPlaying) ttsSpeakVerse(idx+1); };
+  utt.onerror = e => { if(e.error!=="interrupted") console.warn("TTS:",e.error); };
+  speechSynthesis.speak(utt);
+}
+
+function ttsPlay() {
+  if (!ttsSupported||!ttsVerses.length) return;
+  if (ttsPaused) { ttsPaused=false; ttsPlaying=true; speechSynthesis.resume(); ttsSetStatusPlaying(); return; }
+  speechSynthesis.cancel();
+  ttsPlaying=true; ttsPaused=false;
+  ttsSetStatusPlaying();
+  ttsSpeakVerse(ttsCurrentIdx);
+}
+
+function ttsPause() {
+  if (!ttsPlaying) return;
+  ttsPlaying=false; ttsPaused=true; speechSynthesis.pause();
+  hide("audioBtnPause"); show("audioBtnPlay");
+  setText("audioStatusText","நிறுத்தப்பட்டது");
+  const d=$("audioStatusDot"); if(d) d.className="pulse-dot paused";
+}
+
+function ttsStop() {
+  ttsPlaying=false; ttsPaused=false; ttsCurrentIdx=0;
+  speechSynthesis.cancel();
+  document.querySelectorAll(".verse-para").forEach(e=>e.classList.remove("tts-active"));
+  document.querySelectorAll(".verse-chip").forEach(e=>e.classList.remove("tts-active-chip"));
+  hide("audioBtnPause"); show("audioBtnPlay");
+  setText("audioStatusText","தயாராக உள்ளது");
+  setText("audioVerseCounter",`0 / ${ttsVerses.length} வசனங்கள்`);
+  updateProgressBar(0, ttsVerses.length);
+  const d=$("audioStatusDot"); if(d) d.className="pulse-dot stopped";
+}
+
+function ttsJumpToVerse(vNum) {
+  const idx = ttsVerses.findIndex(v=>v.v===vNum);
+  if (idx<0) return;
+  speechSynthesis.cancel(); ttsCurrentIdx=idx;
+  if (ttsPlaying||ttsPaused) { ttsPlaying=true; ttsPaused=false; ttsSetStatusPlaying(); ttsSpeakVerse(idx); }
+  else ttsHighlightVerse(idx);
+}
+
+function ttsPrev() {
+  const idx = Math.max(0, ttsCurrentIdx-1);
+  speechSynthesis.cancel(); ttsCurrentIdx=idx;
+  if(ttsPlaying) ttsSpeakVerse(idx); else ttsHighlightVerse(idx);
+}
+
+function ttsNext() {
+  const idx = Math.min(ttsVerses.length-1, ttsCurrentIdx+1);
+  speechSynthesis.cancel(); ttsCurrentIdx=idx;
+  if(ttsPlaying) ttsSpeakVerse(idx); else ttsHighlightVerse(idx);
+}
+
+function ttsSetStatusPlaying() {
+  hide("audioBtnPlay"); show("audioBtnPause");
+  setText("audioStatusText","வாசிக்கிறது…");
+  const d=$("audioStatusDot"); if(d) d.className="pulse-dot";
+}
+
+function ttsUpdateUI() {
+  if(ttsPlaying){ hide("audioBtnPlay"); show("audioBtnPause"); }
+  else { show("audioBtnPlay"); hide("audioBtnPause"); }
+}
+
+/* =========================================================
+   RANDOM VERSE
+========================================================= */
+const pickRandom = arr => arr[Math.floor(Math.random()*arr.length)];
+
+async function setHomeRandomVerse() {
+  try {
+    if (currentBook) {
+      const p = await loadBook(currentBook.bookNum);
+      const verses = p.versesByChapter.get(currentChapter) || [];
+      if (verses.length) {
+        const v = pickRandom(verses);
+        setText("homeVerseText", `"${v.t}"`);
+        setText("homeVerseRef", `— ${currentBook.name_ta} ${currentChapter}:${v.v}`);
+        return;
+      }
+    }
+    // Fallback inspiring verse
+    setText("homeVerseText", `"கர்த்தர் என் மேய்ப்பராயிருக்கிறார்; நான் தாழ்ச்சியடையேன்."`);
+    setText("homeVerseRef", "— சங்கீதம் 23:1");
+  } catch {
+    setText("homeVerseText", `"கர்த்தர் என் மேய்ப்பராயிருக்கிறார்; நான் தாழ்ச்சியடையேன்."`);
+    setText("homeVerseRef", "— சங்கீதம் 23:1");
+  }
+}
+
+async function setReaderRandomVerse() {
+  try {
+    if (!currentBook) return;
+    const p = await loadBook(currentBook.bookNum);
+    const verses = p.versesByChapter.get(currentChapter) || [];
+    if (verses.length) $(`vb-${pickRandom(verses).v}`)?.scrollIntoView({behavior:"smooth",block:"center"});
+  } catch {}
+}
+
+/* =========================================================
+   HIGHLIGHTER
+========================================================= */
+function applyHighlight(color) {
+  const sel = window.getSelection();
+  if (!sel||!sel.toString().trim()) return;
+  const range = sel.getRangeAt(0);
+  const box = $("verseBox");
+  if (!box?.contains(range.commonAncestorContainer)) return;
+  const span = document.createElement("span");
+  span.style.cssText = `background:${color};padding:2px 4px;border-radius:6px;`;
+  try { range.surroundContents(span); }
+  catch { const txt=sel.toString(); range.deleteContents(); span.textContent=txt; range.insertNode(span); }
+  sel.removeAllRanges();
+}
+
+function clearHighlights() {
+  $("verseBox")?.querySelectorAll("span").forEach(s => {
+    if (s?.style?.backgroundColor) {
+      s.parentNode?.replaceChild(document.createTextNode(s.textContent), s);
+      s.parentNode?.normalize();
+    }
+  });
+}
+
+function setupHighlighter() {
+  const box = $("verseBox");
+  if (!box) return;
+  box.onmouseup = null;
+  if (highlightEnabled) box.onmouseup = () => applyHighlight(highlightColor);
+}
+
+/* =========================================================
+   SONGS
+========================================================= */
+const SONGS_DB = [
+  { title:"அல்லேலூயா பாடல்", snippet:"அல்லேலூயா… கர்த்தரை ஸ்தோத்திரிக்க…" },
+  { title:"கர்த்தர் நல்லவர்", snippet:"கர்த்தர் நல்லவர்… அவர் கிருபை நிலைத்திருக்கும்…" },
+  { title:"நீர் என் மேய்ப்பர்", snippet:"நீர் என் மேய்ப்பர்… எனக்கு குறைவு இல்லை…" },
+];
+
+function doSongSearch() {
+  const q = ($("songQ").value||"").trim().toLowerCase();
+  if (!q) { $("songResults").textContent = "Type something to search."; return; }
+  const hits = SONGS_DB.filter(s => s.title.toLowerCase().includes(q)||s.snippet.toLowerCase().includes(q));
+  $("songResults").innerHTML = hits.length
+    ? hits.map(h=>`<div class="p-3 bg-white rounded-2xl border border-gray-100 mb-2"><div class="font-extrabold text-gray-800">${escapeHTML(h.title)}</div><div class="text-sm text-gray-600 mt-1">${escapeHTML(h.snippet)}</div></div>`).join("")
+    : "No results (mock).";
+}
+
+/* =========================================================
+   UI WIRING
+========================================================= */
+function wireUI() {
+  document.querySelectorAll("[data-screen]").forEach(btn =>
+    btn.addEventListener("click", () => {
+      if (btn.dataset.screen !== "reader") ttsStop();
+      go(btn.dataset.screen);
+    })
+  );
+
+  $("goReader") ?.addEventListener("click", () => go("reader"));
+  $("goReader2")?.addEventListener("click", () => go("reader"));
+  $("goSongs")  ?.addEventListener("click", () => go("songs"));
+
+  $("aMinus")?.addEventListener("click", () => { fontSize=clamp(fontSize-2,12,24); document.body.style.fontSize=`${fontSize}px`; });
+  $("aPlus") ?.addEventListener("click", () => { fontSize=clamp(fontSize+2,12,24); document.body.style.fontSize=`${fontSize}px`; });
+
+  $("homeRandom")  ?.addEventListener("click", setHomeRandomVerse);
+  $("readerRandom")?.addEventListener("click", setReaderRandomVerse);
+
+  $("hlToggle")?.addEventListener("click", () => {
+    highlightEnabled = !highlightEnabled;
+    highlightEnabled ? show("hlColors") : hide("hlColors");
+    setupHighlighter();
+  });
+  $("hlClear")?.addEventListener("click", clearHighlights);
+  document.querySelectorAll("#hlColors button[data-color]").forEach(btn =>
+    btn.addEventListener("click", () => highlightColor = btn.dataset.color));
+
+  $("debugBtn")?.addEventListener("click", () => $("debugBox")?.classList.toggle("hidden"));
+
+  $("songSearch")?.addEventListener("click", doSongSearch);
+  $("songQ")?.addEventListener("keypress", e => { if(e.key==="Enter") doSongSearch(); });
+
+  $("audioBtnPlay") ?.addEventListener("click", ttsPlay);
+  $("audioBtnPause")?.addEventListener("click", ttsPause);
+  $("audioBtnStop") ?.addEventListener("click", ttsStop);
+  $("audioBtnPrev") ?.addEventListener("click", ttsPrev);
+  $("audioBtnNext") ?.addEventListener("click", ttsNext);
+  $("audioSpeed")   ?.addEventListener("change", e => { _ttsRate=parseFloat(e.target.value); setText("audioSpeedLabel",e.target.value+"x"); });
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+(async function init() {
+  wireUI();
+  ttsInit();
+  loadSaintOfDay();
+
+  try {
+    booksOrder = await loadBooksOrder();
+    await renderBookLists();
+  } catch(e) {
+    console.error(e);
+  }
+
+  await setHomeRandomVerse();
+
+  // Start with cross intro, then show home
+  startIntro();
+})();
