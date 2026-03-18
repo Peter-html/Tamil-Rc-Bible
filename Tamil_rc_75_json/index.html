@@ -1,409 +1,642 @@
 <!doctype html>
 <html lang="ta" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>வார்த்தை வாசிப்பு - Tamil RC Bible App</title>
-
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>வார்த்தை வாசிப்பு - Tamil RC Bible</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --deep: #0D1B2A;
+      --parchment: #FDF6E3;
+    }
+
+    * { font-family: 'Noto Sans Tamil', 'Lora', serif; box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; background: var(--deep); }
+
+    /* ── SCROLLBARS ── */
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #EEF2FF; border-radius: 999px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
+
+    /* ── TABS ── */
+    .tab-btn { padding: 8px 18px; border-radius: 999px; font-weight: 700; font-size: 14px; transition: all 0.2s; font-family: 'Cinzel', serif; letter-spacing: 0.03em; }
+    .tab-btn.active { background: var(--gold); color: #0D1B2A; }
+    .tab-btn:not(.active) { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.15); color: white; }
+
+    /* ── HEADER ── */
+    .app-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(13,27,42,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+    }
+
+    /* ── CROSS INTRO OVERLAY ── */
+    #crossIntro {
+      position: fixed; inset: 0; z-index: 999;
+      background: radial-gradient(ellipse at center, #1a2d44 0%, #050d15 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    #crossIntro.fade-out {
+      animation: introFadeOut 1s ease forwards;
+    }
+    @keyframes introFadeOut { to { opacity: 0; pointer-events: none; } }
+
+    .cross-wrap { position: relative; width: 120px; height: 160px; }
+
+    /* Vertical beam */
+    .cross-v {
+      position: absolute; left: 50%; top: 0;
+      transform: translateX(-50%);
+      width: 12px; height: 0; background: var(--gold);
+      border-radius: 6px;
+      animation: growV 0.9s cubic-bezier(.22,1,.36,1) 0.3s forwards;
+      box-shadow: 0 0 24px rgba(201,168,76,0.6), 0 0 60px rgba(201,168,76,0.2);
+    }
+    @keyframes growV { to { height: 160px; } }
+
+    /* Horizontal beam */
+    .cross-h {
+      position: absolute; left: 50%; top: 40px;
+      transform: translateX(-50%);
+      height: 12px; width: 0; background: var(--gold);
+      border-radius: 6px;
+      animation: growH 0.7s cubic-bezier(.22,1,.36,1) 1.2s forwards;
+      box-shadow: 0 0 24px rgba(201,168,76,0.6), 0 0 60px rgba(201,168,76,0.2);
+    }
+    @keyframes growH { to { width: 120px; left: 0; transform: none; } }
+
+    /* Glow pulse after draw */
+    .cross-glow {
+      position: absolute; inset: -30px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.18) 0%, transparent 70%);
+      animation: glowPulse 1.5s ease-in-out 2s infinite alternate;
+      border-radius: 50%;
+    }
+    @keyframes glowPulse { from { opacity: 0.4; transform: scale(1); } to { opacity: 1; transform: scale(1.15); } }
+
+    .intro-title {
+      font-family: 'Cinzel', serif;
+      color: var(--gold-light);
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      letter-spacing: 0.15em;
+      margin-top: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.9s forwards;
+    }
+    .intro-sub {
+      color: rgba(201,168,76,0.5);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 2.2s forwards;
+      font-family: 'Cinzel', serif;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── MAIN APP ── */
+    #app { display: none; }
+    #app.visible { display: block; }
+
+    /* ── HOME HERO ── */
+    .hero-section {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      overflow: hidden;
+      display: flex; align-items: flex-end;
+    }
+
+    .hero-image {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(13,27,42,0.3) 0%, rgba(13,27,42,0.15) 40%, rgba(13,27,42,0.75) 75%, rgba(13,27,42,0.97) 100%),
+        url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80') center/cover no-repeat;
+      transform: scale(1.05);
+      animation: heroZoom 8s ease-out forwards;
+    }
+    @keyframes heroZoom { to { transform: scale(1); } }
+
+    /* Subtle golden particles */
+    .hero-particles {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(201,168,76,0.4) 1px, transparent 1px),
+        radial-gradient(circle, rgba(201,168,76,0.2) 1px, transparent 1px);
+      background-size: 120px 120px, 80px 80px;
+      background-position: 0 0, 40px 40px;
+      animation: particleDrift 20s linear infinite;
+      opacity: 0.3;
+    }
+    @keyframes particleDrift { to { background-position: 120px 120px, 160px 160px; } }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      width: 100%; padding: 0 2rem 4rem;
+      animation: heroContentIn 1.2s ease 0.3s both;
+    }
+    @keyframes heroContentIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
+
+    .hero-cross-small {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--gold); font-family: 'Cinzel', serif;
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .hero-cross-small::before, .hero-cross-small::after {
+      content: '✝'; font-size: 1rem;
+    }
+
+    .hero-quote {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      color: white;
+      line-height: 1.4;
+      max-width: 800px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+      margin-bottom: 1rem;
+    }
+
+    .hero-ref {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+
+    .scroll-hint {
+      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.4); font-size: 0.7rem; letter-spacing: 0.15em;
+      font-family: 'Cinzel', serif;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      animation: scrollHintBob 2s ease-in-out infinite;
+    }
+    @keyframes scrollHintBob { 0%,100%{ transform:translateX(-50%) translateY(0);} 50%{ transform:translateX(-50%) translateY(6px);} }
+    .scroll-arrow { width: 20px; height: 20px; border-right: 1.5px solid rgba(201,168,76,0.5); border-bottom: 1.5px solid rgba(201,168,76,0.5); transform: rotate(45deg); }
+
+    /* ── HOME BODY (below hero) ── */
+    .home-body {
+      background: linear-gradient(180deg, var(--deep) 0%, #0a1520 100%);
+      min-height: 100vh;
+      padding: 3rem 1rem 4rem;
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, rgba(201,168,76,0.4), transparent);
+    }
+
+    /* Saint of the Day card */
+    .saint-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .saint-card::before {
+      content: '✝';
+      position: absolute; top: 16px; right: 20px;
+      font-size: 3rem; color: rgba(201,168,76,0.06);
+      font-family: serif; line-height: 1;
+    }
+    .saint-tag {
+      display: inline-block;
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 999px;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
+      font-family: 'Cinzel', serif;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .saint-name {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      color: white;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .saint-date { color: rgba(201,168,76,0.7); font-size: 0.78rem; font-family: 'Cinzel', serif; margin-bottom: 14px; }
+    .saint-about { color: rgba(255,255,255,0.65); font-size: 0.9rem; line-height: 1.75; }
+    .saint-action-pill {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+      margin: 3px;
+    }
+
+    /* Random verse card */
+    .verse-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 20px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .verse-card::before {
+      content: '\201C';
+      position: absolute; top: -10px; left: 16px;
+      font-size: 8rem; line-height: 1;
+      color: rgba(201,168,76,0.07);
+      font-family: 'Lora', serif;
+    }
+    .verse-text-home {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: rgba(255,255,255,0.9);
+      line-height: 1.8;
+      position: relative; z-index: 1;
+    }
+    .verse-ref-home {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      margin-top: 1rem;
+    }
+    .btn-gold {
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--gold);
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-size: 0.78rem;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-gold:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+
+    .btn-primary-gold {
+      background: var(--gold);
+      color: #0D1B2A;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 28px;
+      font-size: 0.85rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary-gold:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+
+    /* ── READER SCREEN ── */
+    .reader-bg {
+      background: #F8FAFF;
+      min-height: calc(100vh - 72px);
+      padding: 1.5rem 1rem;
+    }
+
+    .pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #F1F5F9; color: #334155; font-weight: 700; }
+    .book-row { border: 1px solid #E5E7EB; border-radius: 16px; padding: 10px 12px; background: white; transition: all 0.15s; }
+    .book-row:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.07); transform: translateY(-1px); }
+    .chapter-btn { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid #E5E7EB; background: white; font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.12s; }
+    .chapter-btn:hover { background: #EFF6FF; border-color: #93C5FD; }
+    .chapter-btn.active { background: #2563EB; color: white; border-color: #2563EB; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .verse-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid #E5E7EB; background: #F8FAFF; font-size: 12px; font-weight: 700; color: #4B5563; cursor: pointer; transition: all 0.1s; }
+    .verse-chip:hover { background: #DBEAFE; border-color: #93C5FD; color: #1D4ED8; }
+    .verse-chip.tts-active-chip { background: #FEF3C7; border-color: #F59E0B; color: #92400E; }
+    .verse-para { transition: background 0.25s ease, border-left 0.25s ease, padding-left 0.25s; border-left: 3px solid transparent; border-radius: 10px; padding: 5px 8px; margin-bottom: 10px; line-height: 1.95; }
+    .verse-para.tts-active { background: linear-gradient(135deg,#FFF9E6,#FFFBF0); border-left: 3px solid #F59E0B; padding-left: 12px; }
+    .verse-box { background: #FAFBFF; border: 1px solid #E5E7EB; border-radius: 18px; padding: 16px 18px; overflow-y: auto; }
+    .scrollbar-reader::-webkit-scrollbar { width: 6px; }
+    .scrollbar-reader::-webkit-scrollbar-track { background: #EEF2FF; border-radius: 999px; }
+    .scrollbar-reader::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
+
+    /* Audio player */
+    .audio-player { background: linear-gradient(135deg,#1a2f4e,#0d1b2e); border-radius: 18px; padding: 12px 14px; color: white; border: 1px solid rgba(255,255,255,0.08); }
+    .audio-btn { border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.12s, background 0.12s; flex-shrink: 0; }
+    .audio-btn:hover { transform: scale(1.1); }
+    .audio-btn:active { transform: scale(0.93); }
+    .audio-btn-play  { width: 46px; height: 46px; background: #F59E0B; color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.4); }
+    .audio-btn-pause { width: 46px; height: 46px; background: #F59E0B; color: white; }
+    .audio-btn-sm    { width: 34px; height: 34px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); }
+    .audio-btn-sm:hover { background: rgba(255,255,255,0.22); }
+    .audio-speed-select { background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .audio-speed-select option { background: #1a2f4e; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
+    .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #10B981; animation: pulse-dot 1.4s ease-in-out infinite; }
+    .pulse-dot.paused  { background: #F59E0B; animation: none; }
+    .pulse-dot.stopped { background: #64748B; animation: none; }
+    .verse-progress-track { height: 3px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; margin: 8px 0; }
+    .verse-progress-fill  { height: 100%; background: #F59E0B; border-radius: 99px; transition: width 0.3s ease; }
+
+    /* Songs */
+    .songs-bg { background: #F8FAFF; min-height: calc(100vh - 72px); padding: 1.5rem 1rem; }
+
+    /* Fade-in on scroll */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
 </head>
+<body>
 
-<body class="h-full overflow-auto">
-  <div class="app-wrapper">
-
-    <!-- TOP NAV (DESKTOP) -->
-    <nav class="desktop-layout sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-              </svg>
-            </div>
-            <div>
-              <h1 id="app-title" class="text-lg font-bold text-gray-800">வார்த்தை வாசிப்பு</h1>
-              <p class="text-xs text-gray-500">Tamil RC Bible | Online/Offline</p>
-            </div>
-          </div>
-
-          <div class="hidden lg:flex items-center space-x-6">
-            <button class="nav-link text-sm font-medium text-blue-600" data-dnav="home">முகப்பு</button>
-            <button class="nav-link text-sm font-medium text-gray-600 hover:text-blue-600" data-dnav="read">வாசிக்க</button>
-            <button class="nav-link text-sm font-medium text-gray-600 hover:text-blue-600" data-dnav="songs">பாடல்கள்</button>
-          </div>
-
-          <div class="flex items-center space-x-4">
-            <div class="hidden sm:flex items-center space-x-1 bg-gray-100 rounded-lg px-2 py-1">
-              <button id="font-decrease" class="w-7 h-7 rounded flex items-center justify-center text-gray-600 hover:bg-white text-sm font-medium">A-</button>
-              <button id="font-increase" class="w-7 h-7 rounded flex items-center justify-center text-gray-600 hover:bg-white text-sm font-medium">A+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- MOBILE HEADER -->
-    <div class="mobile-layout hidden sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100 px-4 py-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-          </div>
-          <div>
-            <h1 id="app-title-mobile" class="text-sm font-bold text-gray-800">வார்த்தை வாசிப்பு</h1>
-            <p class="text-xs text-gray-500">Tamil Bible</p>
-          </div>
-        </div>
-        <button id="m-settings" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- MOBILE TABS -->
-    <div class="mobile-layout hidden sticky top-12 z-40 bg-white border-b border-gray-100 flex">
-      <button class="mobile-tab active" data-mtab="m-home">முகப்பு</button>
-      <button class="mobile-tab" data-mtab="m-read">வாசிக்க</button>
-      <button class="mobile-tab" data-mtab="m-songs">பாடல்கள்</button>
-    </div>
-
-    <!-- =========================
-         DESKTOP SCREENS
-    ========================== -->
-    <main class="desktop-layout">
-
-      <!-- HOME -->
-      <section id="d-home" class="d-screen">
-        <section class="py-12 px-4 sm:px-6 lg:px-8">
-          <div class="max-w-4xl mx-auto text-center">
-            <h2 id="hero-title" class="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">பரிசுத்த வேதாகமம்</h2>
-            <p id="hero-subtitle" class="text-lg text-gray-600 mb-8">உங்கள் தினசரி வாசிப்புக்கு — எளிதாக, அழகாக, வேகமாக.</p>
-          </div>
-        </section>
-
-        <!-- RANDOM DAILY VERSE -->
-        <section class="px-4 sm:px-6 lg:px-8 pb-12">
-          <div class="max-w-6xl mx-auto">
-            <div class="verse-card rounded-3xl card-shadow p-8">
-              <div class="flex items-center justify-between gap-4 mb-6">
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-800">இன்றைய வசனம் (Random)</h3>
-                </div>
-
-                <button id="random-verse-btn" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-semibold">
-                  Random Verse
-                </button>
-              </div>
-
-              <p id="verse-text" class="text-xl text-gray-700 leading-relaxed italic mb-4">"—"</p>
-              <p id="verse-reference" class="text-sm font-semibold text-orange-600">—</p>
-              <p id="random-verse-status" class="text-xs text-gray-500 mt-3"></p>
-            </div>
-          </div>
-        </section>
-      </section>
-
-      <!-- READ (Books → Reader) -->
-      <section id="d-read" class="d-screen hidden">
-        <section class="px-4 sm:px-6 lg:px-8 py-8">
-          <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white rounded-3xl card-shadow p-6">
-              <div class="flex items-center space-x-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-gray-800">பழைய ஏற்பாடு + (RC) துணை நூல்கள்</h3>
-                  <p class="text-sm text-gray-500" id="d-ot-count">Loading...</p>
-                </div>
-              </div>
-              <div class="space-y-2 max-h-[520px] overflow-y-auto scrollbar-thin pr-2" id="d-ot-books"></div>
-            </div>
-
-            <div class="bg-white rounded-3xl card-shadow p-6">
-              <div class="flex items-center space-x-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-gray-800">புதிய ஏற்பாடு</h3>
-                  <p class="text-sm text-gray-500" id="d-nt-count">Loading...</p>
-                </div>
-              </div>
-              <div class="space-y-2 max-h-[520px] overflow-y-auto scrollbar-thin pr-2" id="d-nt-books"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- READER SCREEN (NEXT SLIDE) -->
-        <section id="d-reader" class="px-4 sm:px-6 lg:px-8 pb-12 hidden">
-          <div class="max-w-6xl mx-auto">
-            <div class="flex items-center justify-between mb-4">
-              <button id="d-back-books" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-50">
-                ← Back to Books
-              </button>
-              <div class="text-right">
-                <div id="d-reader-title" class="text-xl font-bold text-gray-800">—</div>
-                <div id="d-reader-subtitle" class="text-sm text-gray-500">—</div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <!-- LEFT: Chapters + Verse list -->
-              <div class="lg:col-span-1 bg-white rounded-3xl card-shadow p-6 max-h-[720px] overflow-hidden flex flex-col">
-                <div class="flex items-center space-x-3 mb-4">
-                  <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-                    </svg>
-                  </div>
-                  <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-800">அதிகாரம் & வசனங்கள்</h3>
-                    <p class="text-xs text-gray-500" id="d-left-info">—</p>
-                  </div>
-                </div>
-
-                <div id="d-chapters" class="mb-4 p-3 bg-gray-50 rounded-lg flex flex-wrap gap-2 max-h-44 overflow-y-auto scrollbar-thin">
-                  <p class="text-xs text-gray-500 w-full">அதிகாரங்களைத் தேர்ந்தெடுக்கவும்</p>
-                </div>
-
-                <div id="d-verse-list" class="flex-1 bg-gray-50 rounded-lg overflow-y-auto space-y-1 p-3 scrollbar-thin">
-                  <p class="text-xs text-gray-500 text-center">வசனங்கள் இங்கே வரும்</p>
-                </div>
-              </div>
-
-              <!-- RIGHT: Verse display + Highlighter + Bio -->
-              <div class="lg:col-span-2 bg-white rounded-3xl card-shadow p-6 max-h-[720px] overflow-hidden flex flex-col">
-                <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-                  <div>
-                    <h3 class="text-lg font-bold text-gray-800">வசனங்கள் வாசிப்பு</h3>
-                    <p class="text-sm text-gray-600" id="d-verse-header">வசனத்தைத் தேர்ந்தெடுக்கவும்</p>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <button id="d-toggle-highlighter" class="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-xl text-sm font-semibold hover:bg-yellow-200">
-                      Highlight
-                    </button>
-                    <button id="d-clear-highlights" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200">
-                      Clear
-                    </button>
-                  </div>
-                </div>
-
-                <div id="d-highlighter-toolbar" class="hidden mb-4 p-3 bg-yellow-50 rounded-xl flex gap-2 items-center">
-                  <span class="text-xs font-semibold text-gray-700">நிறங்கள்:</span>
-                  <button class="hl-dot" data-color="#FDE047" title="மஞ்சள்"></button>
-                  <button class="hl-dot" data-color="#86EFAC" title="பச்சை"></button>
-                  <button class="hl-dot" data-color="#93C5FD" title="நீலம்"></button>
-                  <button class="hl-dot" data-color="#F472B6" title="இளஞ்சிவப்பு"></button>
-                  <button class="hl-dot" data-color="#FECACA" title="சிவப்பு"></button>
-                  <span class="ml-auto text-xs text-gray-600">Text select செய்து color தேர்வு செய்து highlight ஆகும்</span>
-                </div>
-
-                <div id="d-verse-container" class="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-xl mb-4 scrollbar-thin">
-                  <p class="text-gray-500 text-center text-base">வசனங்கள் இங்கே வெளிப்படும்</p>
-                </div>
-
-                <!-- BIO SEARCH -->
-                <div class="mt-2 pt-4 border-t border-gray-200">
-                  <div class="flex gap-2">
-                    <input type="text" id="d-bio-q" placeholder="யார் இவர்? (உதா: தாவீது / மோசே / பவுல்)" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <button id="d-bio-search" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700">
-                      தேடுங்கள்
-                    </button>
-                  </div>
-
-                  <div id="d-bio-result" class="mt-3 p-3 bg-blue-50 rounded-xl hidden">
-                    <div class="text-sm font-bold text-gray-800 mb-1" id="d-bio-title">Bio</div>
-                    <div class="text-sm text-gray-700" id="d-bio-text"></div>
-                    <div class="text-xs text-gray-600 mt-2" id="d-bio-verses"></div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <div id="d-data-status" class="text-xs text-gray-500 mt-4"></div>
-          </div>
-        </section>
-      </section>
-
-      <!-- SONGS -->
-      <section id="d-songs" class="d-screen hidden">
-        <section class="px-4 sm:px-6 lg:px-8 py-10">
-          <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-3xl card-shadow p-6">
-              <h2 class="text-2xl font-bold text-gray-800 mb-2">பாடல்கள் (Search)</h2>
-              <p class="text-sm text-gray-600 mb-5">Songs JSON இப்போ placeholder. பின்னாடி STT + LLM search add செய்யலாம்.</p>
-
-              <div class="flex gap-2 mb-4">
-                <input id="d-song-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="பாடல் பெயர் / வரி (lyrics)..." />
-                <button id="d-song-search" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700">Search</button>
-                <button id="d-song-stt" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200">🎙️ STT</button>
-              </div>
-
-              <div id="d-song-results" class="space-y-3"></div>
-              <div id="d-song-status" class="text-xs text-gray-500 mt-3"></div>
-            </div>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <!-- =========================
-         MOBILE SCREENS
-    ========================== -->
-    <main class="mobile-layout hidden pb-20">
-
-      <!-- MOBILE HOME -->
-      <section id="m-home" class="m-screen px-4 py-4 space-y-3">
-        <div class="bg-white rounded-2xl p-4 shadow-sm">
-          <h2 class="text-lg font-bold text-gray-800 mb-2">பரிசுத்த வேதாகமம்</h2>
-          <p class="text-sm text-gray-600">உங்கள் தினசரி வாசிப்புக்கு — எளிதாக, அழகாக, வேகமாக.</p>
-        </div>
-
-        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 shadow-sm border-l-4 border-orange-500">
-          <div class="flex items-start space-x-3">
-            <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-              </svg>
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <h3 class="font-semibold text-gray-800 text-sm mb-1">Random Verse</h3>
-                <button id="m-random-verse-btn" class="text-xs font-bold text-orange-600 bg-white/70 px-3 py-1 rounded-xl">Random</button>
-              </div>
-              <p id="m-verse-text" class="text-xs text-gray-700 italic mb-2">"—"</p>
-              <p id="m-verse-ref" class="text-xs font-medium text-orange-600">—</p>
-              <p id="m-random-verse-status" class="text-[11px] text-gray-500 mt-2"></p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MOBILE READ -->
-      <section id="m-read" class="m-screen hidden px-4 py-4">
-        <!-- BOOK LIST -->
-        <div id="m-book-list">
-          <div class="bg-white rounded-2xl p-4 shadow-sm mb-3">
-            <h3 class="text-sm font-bold text-gray-800">பழைய ஏற்பாடு + (RC) துணை நூல்கள்</h3>
-            <p class="text-xs text-gray-500" id="m-ot-count">Loading...</p>
-          </div>
-          <div class="space-y-2 mb-6" id="m-ot-books"></div>
-
-          <div class="bg-white rounded-2xl p-4 shadow-sm mb-3">
-            <h3 class="text-sm font-bold text-gray-800">புதிய ஏற்பாடு</h3>
-            <p class="text-xs text-gray-500" id="m-nt-count">Loading...</p>
-          </div>
-          <div class="space-y-2" id="m-nt-books"></div>
-        </div>
-
-        <!-- MOBILE READER (NEXT SLIDE) -->
-        <div id="m-reader" class="hidden">
-          <div class="flex items-center justify-between mb-3">
-            <button id="m-back-books" class="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-50">
-              ← Back
-            </button>
-            <div class="text-right">
-              <div id="m-reader-title" class="text-sm font-bold text-gray-800">—</div>
-              <div id="m-reader-subtitle" class="text-xs text-gray-500">—</div>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-2xl p-3 shadow-sm mb-3">
-            <div class="text-xs font-bold text-gray-700 mb-2">அதிகாரம்</div>
-            <div id="m-chapters" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto scrollbar-thin"></div>
-          </div>
-
-          <div class="bg-white rounded-2xl p-3 shadow-sm mb-3">
-            <div class="flex items-center justify-between mb-2">
-              <div class="text-xs font-bold text-gray-700">வசனங்கள்</div>
-              <div class="flex gap-2">
-                <button id="m-toggle-highlighter" class="text-xs font-bold bg-yellow-100 text-yellow-800 px-3 py-1 rounded-xl">Highlight</button>
-                <button id="m-clear-highlights" class="text-xs font-bold bg-gray-100 text-gray-700 px-3 py-1 rounded-xl">Clear</button>
-              </div>
-            </div>
-
-            <div id="m-highlighter-toolbar" class="hidden mb-2 p-2 bg-yellow-50 rounded-xl flex gap-2 items-center">
-              <button class="hl-dot" data-color="#FDE047"></button>
-              <button class="hl-dot" data-color="#86EFAC"></button>
-              <button class="hl-dot" data-color="#93C5FD"></button>
-              <button class="hl-dot" data-color="#F472B6"></button>
-              <button class="hl-dot" data-color="#FECACA"></button>
-              <span class="ml-auto text-[11px] text-gray-600">select → highlight</span>
-            </div>
-
-            <div id="m-verse-container" class="p-3 bg-gray-50 rounded-xl max-h-64 overflow-y-auto scrollbar-thin">
-              <p class="text-xs text-gray-500 text-center">வசனங்கள் இங்கே வெளிப்படும்</p>
-            </div>
-
-            <div id="m-verse-list" class="mt-3 p-2 bg-gray-50 rounded-xl max-h-48 overflow-y-auto scrollbar-thin space-y-1">
-              <p class="text-xs text-gray-500 text-center">Verse list</p>
-            </div>
-
-            <!-- BIO -->
-            <div class="mt-3">
-              <div class="flex gap-2">
-                <input id="m-bio-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="யார் இவர்? (தாவீது/மோசே)" />
-                <button id="m-bio-search" class="px-3 py-2 bg-purple-600 text-white rounded-xl text-xs font-semibold hover:bg-purple-700">தேடுங்கள்</button>
-              </div>
-              <div id="m-bio-result" class="mt-2 p-3 bg-blue-50 rounded-xl hidden">
-                <div class="text-xs font-bold text-gray-800 mb-1" id="m-bio-title">Bio</div>
-                <div class="text-xs text-gray-700" id="m-bio-text"></div>
-                <div class="text-[11px] text-gray-600 mt-2" id="m-bio-verses"></div>
-              </div>
-            </div>
-
-            <div id="m-data-status" class="text-[11px] text-gray-500 mt-3"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MOBILE SONGS -->
-      <section id="m-songs" class="m-screen hidden px-4 py-4">
-        <div class="bg-white rounded-2xl p-4 shadow-sm">
-          <h3 class="text-sm font-bold text-gray-800 mb-2">பாடல்கள்</h3>
-
-          <div class="flex gap-2 mb-3">
-            <input id="m-song-q" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="பாடல் பெயர் / வரி..." />
-            <button id="m-song-search" class="px-3 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700">Search</button>
-            <button id="m-song-stt" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-200">🎙️</button>
-          </div>
-
-          <div id="m-song-results" class="space-y-3"></div>
-          <div id="m-song-status" class="text-[11px] text-gray-500 mt-3"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="bg-white border-t border-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto text-center">
-        <p class="text-sm text-gray-600">© 2026 | Tamil RC Bible PWA | Offline-first</p>
-      </div>
-    </footer>
-
+<!-- ═══════════════════════════════════════════
+     CROSS INTRO OVERLAY
+═══════════════════════════════════════════ -->
+<div id="crossIntro">
+  <div class="cross-wrap">
+    <div class="cross-v"></div>
+    <div class="cross-h"></div>
+    <div class="cross-glow"></div>
   </div>
+  <div class="intro-title">வார்த்தை வாசிப்பு</div>
+  <div class="intro-sub">TAMIL RC BIBLE</div>
+</div>
 
-  <script src="./js/app.js"></script>
+<!-- ═══════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 40 50" width="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="0" width="8" height="50" rx="4" fill="#C9A84C"/>
+            <rect x="0" y="12" width="40" height="8" rx="4" fill="#C9A84C"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-family:'Cinzel',serif;font-size:0.95rem;font-weight:600;color:white;letter-spacing:0.05em;">வார்த்தை வாசிப்பு</div>
+          <div style="font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:0.08em;font-family:'Cinzel',serif;">TAMIL RC BIBLE</div>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-2">
+        <button class="tab-btn active" data-screen="home">Home</button>
+        <button class="tab-btn" data-screen="reader">Reader</button>
+        <button class="tab-btn" data-screen="songs">Songs</button>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:4px 6px;">
+          <button id="aMinus" style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;">A−</button>
+          <button id="aPlus"  style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;">A+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile tabs -->
+    <div class="md:hidden px-4 pb-3 flex gap-2">
+      <button class="tab-btn active flex-1" data-screen="home">Home</button>
+      <button class="tab-btn flex-1" data-screen="reader">Reader</button>
+      <button class="tab-btn flex-1" data-screen="songs">Songs</button>
+    </div>
+  </header>
+
+  <!-- ═══ HOME ═══════════════════════════════ -->
+  <section id="screen-home" style="padding-top:72px;">
+
+    <!-- HERO -->
+    <div class="hero-section">
+      <div class="hero-image"></div>
+      <div class="hero-particles"></div>
+
+      <div class="hero-content">
+        <div class="hero-cross-small">பரிசுத்த வேதாகமம்</div>
+        <div class="hero-quote">
+          "உங்கள் வார்த்தை என் கால்களுக்கு தீபமும்<br class="hidden md:block">என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது."
+        </div>
+        <div class="hero-ref">சங்கீதம் 119:105</div>
+
+        <div style="margin-top:2rem;display:flex;gap:12px;flex-wrap:wrap;">
+          <button id="goReader" class="btn-primary-gold">வாசிக்க தொடங்கு</button>
+          <button id="goSongs"  class="btn-gold">பாடல்கள்</button>
+        </div>
+      </div>
+
+      <div class="scroll-hint">
+        <span>SCROLL</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </div>
+
+    <!-- HOME BODY -->
+    <div class="home-body">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- SAINT OF THE DAY -->
+        <div class="reveal" style="margin-bottom:3rem;">
+          <div class="section-label">இன்றைய புனிதர்</div>
+          <div class="saint-card p-6 md:p-8">
+            <div class="md:flex gap-8 items-start">
+              <div style="flex:1;">
+                <div class="saint-tag">Saint of the Day</div>
+                <div class="saint-name" id="saintName">புனித பிரகாசி</div>
+                <div class="saint-date" id="saintDate">March 17 · Feast Day</div>
+                <div class="saint-about" id="saintAbout">இது ஒரு placeholder. பின்னர் உண்மையான புனிதர் dataset இணைக்கலாம்.</div>
+                <div style="margin-top:1rem;" id="saintActions"></div>
+              </div>
+              <div style="flex-shrink:0;margin-top:1.5rem;" class="md:mt-0">
+                <div style="width:120px;height:120px;border-radius:20px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;">
+                  <svg viewBox="0 0 60 80" width="40" fill="none">
+                    <rect x="24" y="0" width="12" height="80" rx="6" fill="rgba(201,168,76,0.4)"/>
+                    <rect x="0" y="20" width="60" height="12" rx="6" fill="rgba(201,168,76,0.4)"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RANDOM VERSE -->
+        <div class="reveal">
+          <div class="section-label">இன்றைய வசனம்</div>
+          <div class="verse-card">
+            <div class="verse-text-home" id="homeVerseText">—</div>
+            <div class="verse-ref-home" id="homeVerseRef">—</div>
+            <div style="margin-top:1.5rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button id="homeRandom" class="btn-gold">✦ புதிய வசனம்</button>
+              <button id="goReader2" class="btn-primary-gold" style="font-size:0.75rem;padding:8px 18px;">Bible வாசிக்க →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ READER ══════════════════════════════ -->
+  <section id="screen-reader" class="hidden" style="padding-top:72px;">
+    <div class="reader-bg">
+      <div class="max-w-7xl mx-auto">
+
+        <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+          <div>
+            <h2 style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:600;color:#1E293B;">Reader</h2>
+            <p style="font-size:0.75rem;color:#94A3B8;margin-top:2px;">புத்தகம் → அதிகாரம் → வாசிப்பு</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="hlToggle"     class="px-3 py-2 rounded-2xl bg-yellow-100 text-yellow-800 font-extrabold text-xs">✏️ Highlight</button>
+            <button id="hlClear"      class="px-3 py-2 rounded-2xl bg-gray-100 text-gray-700 font-extrabold text-xs">Clear</button>
+            <button id="readerRandom" class="px-3 py-2 rounded-2xl bg-orange-100 text-orange-700 font-extrabold text-xs">🎲 Random</button>
+            <button id="debugBtn"     class="px-3 py-2 rounded-2xl bg-gray-800 text-white font-extrabold text-xs">Debug</button>
+          </div>
+        </div>
+
+        <div id="debugBox" class="hidden mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-600 leading-relaxed"></div>
+
+        <div id="hlColors" class="hidden mb-3 p-3 rounded-2xl bg-yellow-50 border border-yellow-100 flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-extrabold text-gray-700">நிறம்:</span>
+          <button class="w-7 h-7 rounded-lg bg-yellow-300" data-color="#FDE047"></button>
+          <button class="w-7 h-7 rounded-lg bg-green-300"  data-color="#86EFAC"></button>
+          <button class="w-7 h-7 rounded-lg bg-blue-300"   data-color="#93C5FD"></button>
+          <button class="w-7 h-7 rounded-lg bg-pink-300"   data-color="#F472B6"></button>
+          <button class="w-7 h-7 rounded-lg bg-red-200"    data-color="#FECACA"></button>
+        </div>
+
+        <!-- Book lists -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+          <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="font-extrabold text-gray-800">பழைய ஏற்பாடு</div>
+              <span class="pill">OT · 48</span>
+            </div>
+            <div id="otList" class="max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="font-extrabold text-gray-800">புதிய ஏற்பாடு</div>
+              <span class="pill">NT · 27</span>
+            </div>
+            <div id="ntList" class="max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- Two panel -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+          <div class="lg:col-span-3 flex flex-col gap-3">
+            <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-1">
+                <div class="font-extrabold text-gray-800 text-sm">அதிகாரம்</div>
+                <span class="pill text-xs" id="chapterTitle">—</span>
+              </div>
+              <div class="text-xs text-gray-400 mb-3" id="bookMeta">—</div>
+              <div id="chapters" class="flex flex-wrap gap-1.5 max-h-44 overflow-auto scrollbar-reader"></div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm flex-1">
+              <div class="font-extrabold text-gray-800 text-sm mb-0.5">வசன எண்கள்</div>
+              <div class="text-xs text-gray-400 mb-3">எண்ணை தொட்டால் → jump</div>
+              <div id="verseChips" class="flex flex-wrap gap-1.5 max-h-72 overflow-auto scrollbar-reader">
+                <span class="text-xs text-gray-400">புத்தகம் திற…</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-9 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-extrabold text-gray-800">வாசிப்பு</div>
+                <div class="text-xs text-gray-500 mt-0.5" id="readingTitle">புத்தகம் திறந்து வாசிக்கத் தொடங்குங்கள்</div>
+              </div>
+            </div>
+
+            <!-- Audio player -->
+            <div id="audioPlayer" class="audio-player hidden">
+              <div class="flex items-center justify-between mb-2">
+                <div class="min-w-0">
+                  <div class="font-extrabold text-white text-sm truncate" id="audioChapterLabel">—</div>
+                  <div class="text-xs mt-0.5 truncate" id="audioVoiceInfo" style="color:rgba(255,255,255,0.5)">voice loading…</div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 ml-3">
+                  <div class="pulse-dot stopped" id="audioStatusDot"></div>
+                  <span class="text-xs font-bold whitespace-nowrap" style="color:rgba(255,255,255,0.75)" id="audioStatusText">தயாராக உள்ளது</span>
+                </div>
+              </div>
+              <div class="verse-progress-track"><div class="verse-progress-fill" id="audioProgressFill" style="width:0%"></div></div>
+              <div class="flex justify-between text-xs mb-2" style="color:rgba(255,255,255,0.4)">
+                <span id="audioVerseCounter">0 / 0 வசனங்கள்</span>
+                <span id="audioSpeedLabel">0.85x</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="audioBtnPrev"  class="audio-btn audio-btn-sm"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+                <button id="audioBtnPlay"  class="audio-btn audio-btn-play"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+                <button id="audioBtnPause" class="audio-btn audio-btn-pause hidden"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <button id="audioBtnStop"  class="audio-btn audio-btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg></button>
+                <button id="audioBtnNext"  class="audio-btn audio-btn-sm"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6h2v12h-2z"/></svg></button>
+                <div class="ml-auto flex items-center gap-1.5">
+                  <span class="text-xs" style="color:rgba(255,255,255,0.5)">வேகம்</span>
+                  <select id="audioSpeed" class="audio-speed-select">
+                    <option value="0.7">0.7x</option>
+                    <option value="0.85" selected>0.85x</option>
+                    <option value="1.0">1.0x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                  </select>
+                </div>
+              </div>
+              <p class="text-xs mt-2" style="color:rgba(255,255,255,0.3)">▶ Play → ஒவ்வொரு வசனமாக தமிழில் படிக்கும் · வசன எண் click → அந்த இடத்திலிருந்து தொடங்கும்</p>
+            </div>
+
+            <div id="verseBox" class="verse-box scrollbar-reader" style="height:58vh;font-size:1.05rem;">
+              <div class="text-gray-400 text-center mt-10">ஒரு புத்தகம் "Open" செய்யுங்கள்.</div>
+            </div>
+            <div id="readerError" class="hidden text-sm font-extrabold text-red-600"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SONGS ═══════════════════════════════ -->
+  <section id="screen-songs" class="hidden" style="padding-top:72px;">
+    <div class="songs-bg">
+      <div class="max-w-3xl mx-auto">
+        <h2 style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:600;color:#1E293B;margin-bottom:4px;">Songs</h2>
+        <p style="font-size:0.8rem;color:#94A3B8;margin-bottom:1.5rem;">பாடல்கள் தேடல் (local mock).</p>
+        <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
+          <div class="flex gap-2">
+            <input id="songQ" class="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-sm" placeholder="Song பெயர் / lyric தேடுங்கள்..."/>
+            <button id="songSearch" class="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm">Search</button>
+          </div>
+          <div class="mt-3 text-xs text-gray-500 font-semibold">Results:</div>
+          <div id="songResults" class="mt-2 text-gray-600 text-sm">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end #app -->
+
+<script src="./js/app.js"></script>
 </body>
 </html>
