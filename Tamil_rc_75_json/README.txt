@@ -1,1 +1,4 @@
-See books_order.json and data/*/*.json. Each chapter is an array of blocks: titles (T) and verses (V).
+Lai keep the files in the same order this is in the github 
+And in Index.html in above after 
+<script src="./js/saints-loader.js"></script>
+add this line in the header file 
