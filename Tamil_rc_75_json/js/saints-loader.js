@@ -60,7 +60,7 @@
     const quoteEl = document.getElementById('saintActions');
     if (quoteEl) {
       quoteEl.innerHTML = saint.quoteTa
-        ? `<span style="font-style:italic;opacity:0.85">"${saint.quoteTa}"</span>`
+        ? `<span style="font-style:italic;color:#ffffff">"${saint.quoteTa}"</span>`
         : '';
     }
 
