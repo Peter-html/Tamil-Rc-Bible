@@ -8,367 +8,120 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --gold: #C9A84C;
-      --gold-light: #E8C97A;
-      --deep: #0D1B2A;
-      --parchment: #FDF6E3;
-    }
-
-    * { font-family: 'Noto Sans Tamil', 'Lora', serif; box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; background: var(--deep); }
-
-    /* ── SCROLLBARS ── */
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: #EEF2FF; border-radius: 999px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
-
-    /* ── TABS ── */
-    .tab-btn { padding: 8px 18px; border-radius: 999px; font-weight: 700; font-size: 14px; transition: all 0.2s; font-family: 'Cinzel', serif; letter-spacing: 0.03em; }
-    .tab-btn.active { background: var(--gold); color: #0D1B2A; }
-    .tab-btn:not(.active) { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
-    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.15); color: white; }
-
-    /* ── HEADER ── */
-    .app-header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(13,27,42,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(201,168,76,0.2);
-    }
-
-    /* ── CROSS INTRO OVERLAY ── */
-    #crossIntro {
-      position: fixed; inset: 0; z-index: 999;
-      background: radial-gradient(ellipse at center, #1a2d44 0%, #050d15 100%);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
-    }
-    #crossIntro.fade-out {
-      animation: introFadeOut 1s ease forwards;
-    }
-    @keyframes introFadeOut { to { opacity: 0; pointer-events: none; } }
-
-    .cross-wrap { position: relative; width: 120px; height: 160px; }
-
-    /* Vertical beam */
-    .cross-v {
-      position: absolute; left: 50%; top: 0;
-      transform: translateX(-50%);
-      width: 12px; height: 0; background: var(--gold);
-      border-radius: 6px;
-      animation: growV 0.9s cubic-bezier(.22,1,.36,1) 0.3s forwards;
-      box-shadow: 0 0 24px rgba(201,168,76,0.6), 0 0 60px rgba(201,168,76,0.2);
-    }
-    @keyframes growV { to { height: 160px; } }
-
-    /* Horizontal beam */
-    .cross-h {
-      position: absolute; left: 50%; top: 40px;
-      transform: translateX(-50%);
-      height: 12px; width: 0; background: var(--gold);
-      border-radius: 6px;
-      animation: growH 0.7s cubic-bezier(.22,1,.36,1) 1.2s forwards;
-      box-shadow: 0 0 24px rgba(201,168,76,0.6), 0 0 60px rgba(201,168,76,0.2);
-    }
-    @keyframes growH { to { width: 120px; left: 0; transform: none; } }
-
-    /* Glow pulse after draw */
-    .cross-glow {
-      position: absolute; inset: -30px;
-      background: radial-gradient(ellipse, rgba(201,168,76,0.18) 0%, transparent 70%);
-      animation: glowPulse 1.5s ease-in-out 2s infinite alternate;
-      border-radius: 50%;
-    }
-    @keyframes glowPulse { from { opacity: 0.4; transform: scale(1); } to { opacity: 1; transform: scale(1.15); } }
-
-    .intro-title {
-      font-family: 'Cinzel', serif;
-      color: var(--gold-light);
-      font-size: clamp(1.1rem, 3vw, 1.5rem);
-      letter-spacing: 0.15em;
-      margin-top: 48px;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 1.9s forwards;
-    }
-    .intro-sub {
-      color: rgba(201,168,76,0.5);
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      margin-top: 8px;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 2.2s forwards;
-      font-family: 'Cinzel', serif;
-    }
+    :root { --gold:#C9A84C; --gold-light:#E8C97A; --deep:#0D1B2A; --parchment:#FDF6E3; }
+    * { font-family:'Noto Sans Tamil','Lora',serif; box-sizing:border-box; }
+    html,body { height:100%; margin:0; padding:0; background:var(--deep); }
+    .scrollbar-thin::-webkit-scrollbar { width:6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background:#EEF2FF; border-radius:999px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:999px; }
+    .tab-btn { padding:8px 18px; border-radius:999px; font-weight:700; font-size:14px; transition:all 0.2s; font-family:'Cinzel',serif; letter-spacing:0.03em; }
+    .tab-btn.active { background:var(--gold); color:#0D1B2A; }
+    .tab-btn:not(.active) { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); }
+    .tab-btn:not(.active):hover { background:rgba(255,255,255,0.15); color:white; }
+    .app-header { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(13,27,42,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(201,168,76,0.2); }
+    #crossIntro { position:fixed; inset:0; z-index:999; background:radial-gradient(ellipse at center,#1a2d44 0%,#050d15 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; }
+    #crossIntro.fade-out { animation:introFadeOut 1s ease forwards; }
+    @keyframes introFadeOut { to { opacity:0; pointer-events:none; } }
+    .cross-wrap { position:relative; width:120px; height:160px; }
+    .cross-v { position:absolute; left:50%; top:0; transform:translateX(-50%); width:12px; height:0; background:var(--gold); border-radius:6px; animation:growV 0.9s cubic-bezier(.22,1,.36,1) 0.3s forwards; box-shadow:0 0 24px rgba(201,168,76,0.6),0 0 60px rgba(201,168,76,0.2); }
+    @keyframes growV { to { height:160px; } }
+    .cross-h { position:absolute; left:50%; top:40px; transform:translateX(-50%); height:12px; width:0; background:var(--gold); border-radius:6px; animation:growH 0.7s cubic-bezier(.22,1,.36,1) 1.2s forwards; box-shadow:0 0 24px rgba(201,168,76,0.6),0 0 60px rgba(201,168,76,0.2); }
+    @keyframes growH { to { width:120px; left:0; transform:none; } }
+    .cross-glow { position:absolute; inset:-30px; background:radial-gradient(ellipse,rgba(201,168,76,0.18) 0%,transparent 70%); animation:glowPulse 1.5s ease-in-out 2s infinite alternate; border-radius:50%; }
+    @keyframes glowPulse { from { opacity:0.4; transform:scale(1); } to { opacity:1; transform:scale(1.15); } }
+    .intro-title { font-family:'Cinzel',serif; color:var(--gold-light); font-size:clamp(1.1rem,3vw,1.5rem); letter-spacing:0.15em; margin-top:48px; opacity:0; animation:fadeUp 0.8s ease 1.9s forwards; }
+    .intro-sub { color:rgba(201,168,76,0.5); font-size:0.8rem; letter-spacing:0.1em; margin-top:8px; opacity:0; animation:fadeUp 0.8s ease 2.2s forwards; font-family:'Cinzel',serif; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
-
-    /* ── MAIN APP ── */
-    #app { display: none; }
-    #app.visible { display: block; }
-
-    /* ── HOME HERO ── */
-    .hero-section {
-      position: relative;
-      height: 100vh;
-      min-height: 600px;
-      overflow: hidden;
-      display: flex; align-items: flex-end;
-    }
-
-    .hero-image {
-      position: absolute; inset: 0;
-      background:
-        linear-gradient(to bottom, rgba(13,27,42,0.3) 0%, rgba(13,27,42,0.15) 40%, rgba(13,27,42,0.75) 75%, rgba(13,27,42,0.97) 100%),
-        url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80') center/cover no-repeat;
-      transform: scale(1.05);
-      animation: heroZoom 8s ease-out forwards;
-    }
-    @keyframes heroZoom { to { transform: scale(1); } }
-
-    /* Subtle golden particles */
-    .hero-particles {
-      position: absolute; inset: 0; pointer-events: none;
-      background-image:
-        radial-gradient(circle, rgba(201,168,76,0.4) 1px, transparent 1px),
-        radial-gradient(circle, rgba(201,168,76,0.2) 1px, transparent 1px);
-      background-size: 120px 120px, 80px 80px;
-      background-position: 0 0, 40px 40px;
-      animation: particleDrift 20s linear infinite;
-      opacity: 0.3;
-    }
-    @keyframes particleDrift { to { background-position: 120px 120px, 160px 160px; } }
-
-    .hero-content {
-      position: relative; z-index: 2;
-      width: 100%; padding: 0 2rem 4rem;
-      animation: heroContentIn 1.2s ease 0.3s both;
-    }
+    #app { display:none; }
+    #app.visible { display:block; }
+    .hero-section { position:relative; height:100vh; min-height:600px; overflow:hidden; display:flex; align-items:flex-end; }
+    .hero-image { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(13,27,42,0.3) 0%,rgba(13,27,42,0.15) 40%,rgba(13,27,42,0.75) 75%,rgba(13,27,42,0.97) 100%),url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80') center/cover no-repeat; transform:scale(1.05); animation:heroZoom 8s ease-out forwards; }
+    @keyframes heroZoom { to { transform:scale(1); } }
+    .hero-particles { position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(circle,rgba(201,168,76,0.4) 1px,transparent 1px),radial-gradient(circle,rgba(201,168,76,0.2) 1px,transparent 1px); background-size:120px 120px,80px 80px; background-position:0 0,40px 40px; animation:particleDrift 20s linear infinite; opacity:0.3; }
+    @keyframes particleDrift { to { background-position:120px 120px,160px 160px; } }
+    .hero-content { position:relative; z-index:2; width:100%; padding:0 2rem 4rem; animation:heroContentIn 1.2s ease 0.3s both; }
     @keyframes heroContentIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
-
-    .hero-cross-small {
-      display: inline-flex; align-items: center; gap: 10px;
-      color: var(--gold); font-family: 'Cinzel', serif;
-      font-size: 0.75rem; letter-spacing: 0.2em;
-      text-transform: uppercase; margin-bottom: 1rem;
-    }
-    .hero-cross-small::before, .hero-cross-small::after {
-      content: '✝'; font-size: 1rem;
-    }
-
-    .hero-quote {
-      font-family: 'Lora', serif;
-      font-style: italic;
-      font-size: clamp(1.4rem, 4vw, 2.4rem);
-      color: white;
-      line-height: 1.4;
-      max-width: 800px;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
-      margin-bottom: 1rem;
-    }
-
-    .hero-ref {
-      font-family: 'Cinzel', serif;
-      color: var(--gold);
-      font-size: 0.85rem;
-      letter-spacing: 0.1em;
-    }
-
-    .scroll-hint {
-      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      color: rgba(255,255,255,0.4); font-size: 0.7rem; letter-spacing: 0.15em;
-      font-family: 'Cinzel', serif;
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      animation: scrollHintBob 2s ease-in-out infinite;
-    }
+    .hero-cross-small { display:inline-flex; align-items:center; gap:10px; color:var(--gold); font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1rem; }
+    .hero-cross-small::before,.hero-cross-small::after { content:'✝'; font-size:1rem; }
+    .hero-quote { font-family:'Lora',serif; font-style:italic; font-size:clamp(1.4rem,4vw,2.4rem); color:white; line-height:1.4; max-width:800px; text-shadow:0 2px 20px rgba(0,0,0,0.5); margin-bottom:1rem; }
+    .hero-ref { font-family:'Cinzel',serif; color:var(--gold); font-size:0.85rem; letter-spacing:0.1em; }
+    .scroll-hint { position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.4); font-size:0.7rem; letter-spacing:0.15em; font-family:'Cinzel',serif; display:flex; flex-direction:column; align-items:center; gap:6px; animation:scrollHintBob 2s ease-in-out infinite; }
     @keyframes scrollHintBob { 0%,100%{ transform:translateX(-50%) translateY(0);} 50%{ transform:translateX(-50%) translateY(6px);} }
-    .scroll-arrow { width: 20px; height: 20px; border-right: 1.5px solid rgba(201,168,76,0.5); border-bottom: 1.5px solid rgba(201,168,76,0.5); transform: rotate(45deg); }
-
-    /* ── HOME BODY (below hero) ── */
-    .home-body {
-      background: linear-gradient(180deg, var(--deep) 0%, #0a1520 100%);
-      min-height: 100vh;
-      padding: 3rem 1rem 4rem;
-    }
-
-    .section-label {
-      font-family: 'Cinzel', serif;
-      color: var(--gold);
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 1.5rem;
-    }
-    .section-label::after {
-      content: '';
-      flex: 1; height: 1px;
-      background: linear-gradient(to right, rgba(201,168,76,0.4), transparent);
-    }
-
-    /* Saint of the Day card */
-    .saint-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(201,168,76,0.15);
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-    .saint-card::before {
-      content: '✝';
-      position: absolute; top: 16px; right: 20px;
-      font-size: 3rem; color: rgba(201,168,76,0.06);
-      font-family: serif; line-height: 1;
-    }
-    .saint-tag {
-      display: inline-block;
-      background: rgba(201,168,76,0.12);
-      color: var(--gold);
-      border: 1px solid rgba(201,168,76,0.25);
-      border-radius: 999px;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      padding: 3px 10px;
-      font-family: 'Cinzel', serif;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    .saint-name {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: white;
-      font-weight: 600;
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-    .saint-date { color: rgba(201,168,76,0.7); font-size: 0.78rem; font-family: 'Cinzel', serif; margin-bottom: 14px; }
-    .saint-about { color: rgba(255,255,255,0.65); font-size: 0.9rem; line-height: 1.75; }
-    .saint-action-pill {
-      display: inline-block;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 999px;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.6);
-      margin: 3px;
-    }
-
-    /* Random verse card */
-    .verse-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(201,168,76,0.15);
-      border-radius: 20px;
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .verse-card::before {
-      content: '\201C';
-      position: absolute; top: -10px; left: 16px;
-      font-size: 8rem; line-height: 1;
-      color: rgba(201,168,76,0.07);
-      font-family: 'Lora', serif;
-    }
-    .verse-text-home {
-      font-family: 'Lora', serif;
-      font-style: italic;
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: rgba(255,255,255,0.9);
-      line-height: 1.8;
-      position: relative; z-index: 1;
-    }
-    .verse-ref-home {
-      font-family: 'Cinzel', serif;
-      color: var(--gold);
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      margin-top: 1rem;
-    }
-    .btn-gold {
-      background: transparent;
-      border: 1px solid rgba(201,168,76,0.4);
-      color: var(--gold);
-      border-radius: 999px;
-      padding: 8px 20px;
-      font-size: 0.78rem;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-gold:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); }
-
-    .btn-primary-gold {
-      background: var(--gold);
-      color: #0D1B2A;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 28px;
-      font-size: 0.85rem;
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-primary-gold:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
-
-    /* ── READER SCREEN ── */
-    .reader-bg {
-      background: #F8FAFF;
-      min-height: calc(100vh - 72px);
-      padding: 1.5rem 1rem;
-    }
-
-    .pill { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: #F1F5F9; color: #334155; font-weight: 700; }
-    .book-row { border: 1px solid #E5E7EB; border-radius: 16px; padding: 10px 12px; background: white; transition: all 0.15s; }
-    .book-row:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.07); transform: translateY(-1px); }
-    .chapter-btn { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid #E5E7EB; background: white; font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.12s; }
-    .chapter-btn:hover { background: #EFF6FF; border-color: #93C5FD; }
-    .chapter-btn.active { background: #2563EB; color: white; border-color: #2563EB; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-    .verse-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid #E5E7EB; background: #F8FAFF; font-size: 12px; font-weight: 700; color: #4B5563; cursor: pointer; transition: all 0.1s; }
-    .verse-chip:hover { background: #DBEAFE; border-color: #93C5FD; color: #1D4ED8; }
-    .verse-chip.tts-active-chip { background: #FEF3C7; border-color: #F59E0B; color: #92400E; }
-    .verse-para { transition: background 0.25s ease, border-left 0.25s ease, padding-left 0.25s; border-left: 3px solid transparent; border-radius: 10px; padding: 5px 8px; margin-bottom: 10px; line-height: 1.95; }
-    .verse-para.tts-active { background: linear-gradient(135deg,#FFF9E6,#FFFBF0); border-left: 3px solid #F59E0B; padding-left: 12px; }
-    .verse-box { background: #FAFBFF; border: 1px solid #E5E7EB; border-radius: 18px; padding: 16px 18px; overflow-y: auto; }
-    .scrollbar-reader::-webkit-scrollbar { width: 6px; }
-    .scrollbar-reader::-webkit-scrollbar-track { background: #EEF2FF; border-radius: 999px; }
-    .scrollbar-reader::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
-
-    /* Audio player */
-    .audio-player { background: linear-gradient(135deg,#1a2f4e,#0d1b2e); border-radius: 18px; padding: 12px 14px; color: white; border: 1px solid rgba(255,255,255,0.08); }
-    .audio-btn { border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.12s, background 0.12s; flex-shrink: 0; }
-    .audio-btn:hover { transform: scale(1.1); }
-    .audio-btn:active { transform: scale(0.93); }
-    .audio-btn-play  { width: 46px; height: 46px; background: #F59E0B; color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.4); }
-    .audio-btn-pause { width: 46px; height: 46px; background: #F59E0B; color: white; }
-    .audio-btn-sm    { width: 34px; height: 34px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); }
-    .audio-btn-sm:hover { background: rgba(255,255,255,0.22); }
-    .audio-speed-select { background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .audio-speed-select option { background: #1a2f4e; }
+    .scroll-arrow { width:20px; height:20px; border-right:1.5px solid rgba(201,168,76,0.5); border-bottom:1.5px solid rgba(201,168,76,0.5); transform:rotate(45deg); }
+    .home-body { background:linear-gradient(180deg,var(--deep) 0%,#0a1520 100%); min-height:100vh; padding:3rem 1rem 4rem; }
+    .section-label { font-family:'Cinzel',serif; color:var(--gold); font-size:0.7rem; letter-spacing:0.25em; text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:1.5rem; }
+    .section-label::after { content:''; flex:1; height:1px; background:linear-gradient(to right,rgba(201,168,76,0.4),transparent); }
+    .saint-card { background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15); border-radius:20px; overflow:hidden; position:relative; }
+    .saint-card::before { content:'✝'; position:absolute; top:16px; right:20px; font-size:3rem; color:rgba(201,168,76,0.06); font-family:serif; line-height:1; }
+    .saint-tag { display:inline-block; background:rgba(201,168,76,0.12); color:var(--gold); border:1px solid rgba(201,168,76,0.25); border-radius:999px; font-size:0.65rem; letter-spacing:0.12em; padding:3px 10px; font-family:'Cinzel',serif; text-transform:uppercase; margin-bottom:10px; }
+    .saint-name { font-family:'Cinzel',serif; font-size:clamp(1.1rem,2.5vw,1.5rem); color:white; font-weight:600; margin-bottom:6px; line-height:1.3; }
+    .saint-date { color:rgba(201,168,76,0.7); font-size:0.78rem; font-family:'Cinzel',serif; margin-bottom:14px; }
+    .saint-about { color:rgba(255,255,255,0.65); font-size:0.9rem; line-height:1.75; }
+    .verse-card { background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15); border-radius:20px; padding:2rem; position:relative; overflow:hidden; }
+    .verse-card::before { content:'\201C'; position:absolute; top:-10px; left:16px; font-size:8rem; line-height:1; color:rgba(201,168,76,0.07); font-family:'Lora',serif; }
+    .verse-text-home { font-family:'Lora',serif; font-style:italic; font-size:clamp(1rem,2.5vw,1.25rem); color:rgba(255,255,255,0.9); line-height:1.8; position:relative; z-index:1; }
+    .verse-ref-home { font-family:'Cinzel',serif; color:var(--gold); font-size:0.8rem; letter-spacing:0.08em; margin-top:1rem; }
+    .btn-gold { background:transparent; border:1px solid rgba(201,168,76,0.4); color:var(--gold); border-radius:999px; padding:8px 20px; font-size:0.78rem; font-family:'Cinzel',serif; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
+    .btn-gold:hover { background:rgba(201,168,76,0.12); border-color:var(--gold); }
+    .btn-primary-gold { background:var(--gold); color:#0D1B2A; border:none; border-radius:999px; padding:10px 28px; font-size:0.85rem; font-family:'Cinzel',serif; font-weight:700; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
+    .btn-primary-gold:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,168,76,0.3); }
+    .reader-bg { background:#F8FAFF; min-height:calc(100vh - 72px); padding:1.5rem 1rem; }
+    .pill { font-size:12px; padding:3px 10px; border-radius:999px; background:#F1F5F9; color:#334155; font-weight:700; }
+    .book-row { border:1px solid #E5E7EB; border-radius:16px; padding:10px 12px; background:white; transition:all 0.15s; }
+    .book-row:hover { box-shadow:0 8px 20px rgba(0,0,0,0.07); transform:translateY(-1px); }
+    .chapter-btn { width:40px; height:40px; border-radius:12px; border:1.5px solid #E5E7EB; background:white; font-weight:800; font-size:13px; cursor:pointer; transition:all 0.12s; }
+    .chapter-btn:hover { background:#EFF6FF; border-color:#93C5FD; }
+    .chapter-btn.active { background:#2563EB; color:white; border-color:#2563EB; box-shadow:0 4px 12px rgba(37,99,235,0.3); }
+    .verse-chip { display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:30px; padding:0 8px; border-radius:8px; border:1px solid #E5E7EB; background:#F8FAFF; font-size:12px; font-weight:700; color:#4B5563; cursor:pointer; transition:all 0.1s; }
+    .verse-chip:hover { background:#DBEAFE; border-color:#93C5FD; color:#1D4ED8; }
+    .verse-chip.tts-active-chip { background:#FEF3C7; border-color:#F59E0B; color:#92400E; }
+    .verse-para { transition:background 0.25s ease,border-left 0.25s ease,padding-left 0.25s; border-left:3px solid transparent; border-radius:10px; padding:5px 8px; margin-bottom:10px; line-height:1.95; }
+    .verse-para.tts-active { background:linear-gradient(135deg,#FFF9E6,#FFFBF0); border-left:3px solid #F59E0B; padding-left:12px; }
+    .verse-box { background:#FAFBFF; border:1px solid #E5E7EB; border-radius:18px; padding:16px 18px; overflow-y:auto; }
+    .scrollbar-reader::-webkit-scrollbar { width:6px; }
+    .scrollbar-reader::-webkit-scrollbar-track { background:#EEF2FF; border-radius:999px; }
+    .scrollbar-reader::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:999px; }
+    .audio-player { background:linear-gradient(135deg,#1a2f4e,#0d1b2e); border-radius:18px; padding:12px 14px; color:white; border:1px solid rgba(255,255,255,0.08); }
+    .audio-btn { border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.12s,background 0.12s; flex-shrink:0; }
+    .audio-btn:hover { transform:scale(1.1); }
+    .audio-btn:active { transform:scale(0.93); }
+    .audio-btn-play  { width:46px; height:46px; background:#F59E0B; color:white; box-shadow:0 4px 14px rgba(245,158,11,0.4); }
+    .audio-btn-pause { width:46px; height:46px; background:#F59E0B; color:white; }
+    .audio-btn-sm    { width:34px; height:34px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); }
+    .audio-btn-sm:hover { background:rgba(255,255,255,0.22); }
+    .audio-speed-select { background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:4px 8px; font-size:12px; font-weight:700; cursor:pointer; }
+    .audio-speed-select option { background:#1a2f4e; }
     @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.75)} }
-    .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #10B981; animation: pulse-dot 1.4s ease-in-out infinite; }
-    .pulse-dot.paused  { background: #F59E0B; animation: none; }
-    .pulse-dot.stopped { background: #64748B; animation: none; }
-    .verse-progress-track { height: 3px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; margin: 8px 0; }
-    .verse-progress-fill  { height: 100%; background: #F59E0B; border-radius: 99px; transition: width 0.3s ease; }
+    .pulse-dot { width:7px; height:7px; border-radius:50%; background:#10B981; animation:pulse-dot 1.4s ease-in-out infinite; }
+    .pulse-dot.paused  { background:#F59E0B; animation:none; }
+    .pulse-dot.stopped { background:#64748B; animation:none; }
+    .verse-progress-track { height:3px; background:rgba(255,255,255,0.12); border-radius:99px; overflow:hidden; margin:8px 0; }
+    .verse-progress-fill  { height:100%; background:#F59E0B; border-radius:99px; transition:width 0.3s ease; }
+    .songs-bg { background:#F8FAFF; min-height:calc(100vh - 72px); padding:1.5rem 1rem; }
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:none; }
 
-    /* Songs */
-    .songs-bg { background: #F8FAFF; min-height: calc(100vh - 72px); padding: 1.5rem 1rem; }
+    /* ── MARQUEE ── */
+    .mq-item { font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.18em; color:rgba(201,168,76,0.6); padding:0 28px; display:inline-block; }
+    .mq-dot  { color:rgba(201,168,76,0.25); font-size:1.2rem; display:inline-block; vertical-align:middle; }
+    @keyframes marqueeScroll { 0%{ transform:translateX(0); } 100%{ transform:translateX(-33.333%); } }
+    #marqueeTrack { animation:marqueeScroll 28s linear infinite; }
+    #marqueeTrack:hover { animation-play-state:paused; }
 
-    /* Fade-in on scroll */
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
+    /* ── CONTACT CARDS ── */
+    .contact-card { background:rgba(255,255,255,0.02); border:1px solid rgba(201,168,76,0.1); border-radius:20px; padding:1.75rem 1.5rem; display:flex; flex-direction:column; gap:12px; transition:border-color 0.3s,transform 0.3s,background 0.3s; }
+    .contact-card:hover { border-color:rgba(201,168,76,0.35); background:rgba(201,168,76,0.04); transform:translateY(-4px); }
+    .contact-card a { color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.875rem; transition:color 0.2s; word-break:break-all; }
+    .contact-card a:hover { color:#E8C97A; }
+    .contact-icon { width:44px; height:44px; border-radius:13px; background:rgba(201,168,76,0.09); border:1px solid rgba(201,168,76,0.18); display:flex; align-items:center; justify-content:center; }
+    .contact-label { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.2em; color:rgba(201,168,76,0.45); }
+    .linkedin-card { background:rgba(0,119,181,0.04); border-color:rgba(0,119,181,0.18); }
+    .linkedin-card:hover { border-color:rgba(0,119,181,0.5); background:rgba(0,119,181,0.09); transform:translateY(-4px); }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     CROSS INTRO OVERLAY
-═══════════════════════════════════════════ -->
 <div id="crossIntro">
   <div class="cross-wrap">
     <div class="cross-v"></div>
@@ -379,9 +132,6 @@
   <div class="intro-sub">TAMIL RC BIBLE</div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN APP
-═══════════════════════════════════════════ -->
 <div id="app">
 
   <!-- HEADER -->
@@ -389,7 +139,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
-          <svg viewBox="0 0 40 50" width="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 40 50" width="22" fill="none">
             <rect x="16" y="0" width="8" height="50" rx="4" fill="#C9A84C"/>
             <rect x="0" y="12" width="40" height="8" rx="4" fill="#C9A84C"/>
           </svg>
@@ -399,13 +149,11 @@
           <div style="font-size:0.65rem;color:rgba(201,168,76,0.6);letter-spacing:0.08em;font-family:'Cinzel',serif;">TAMIL RC BIBLE</div>
         </div>
       </div>
-
       <nav class="hidden md:flex items-center gap-2">
         <button class="tab-btn active" data-screen="home">Home</button>
         <button class="tab-btn" data-screen="reader">Reader</button>
         <button class="tab-btn" data-screen="songs">Songs</button>
       </nav>
-
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-1" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:4px 6px;">
           <button id="aMinus" style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;">A−</button>
@@ -413,8 +161,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Mobile tabs -->
     <div class="md:hidden px-4 pb-3 flex gap-2">
       <button class="tab-btn active flex-1" data-screen="home">Home</button>
       <button class="tab-btn flex-1" data-screen="reader">Reader</button>
@@ -422,55 +168,44 @@
     </div>
   </header>
 
-  <!-- ═══ HOME ═══════════════════════════════ -->
+  <!-- ═══ HOME ═══ -->
   <section id="screen-home" style="padding-top:72px;">
 
     <!-- HERO -->
     <div class="hero-section">
       <div class="hero-image"></div>
       <div class="hero-particles"></div>
-
       <div class="hero-content">
         <div class="hero-cross-small">பரிசுத்த வேதாகமம்</div>
-        <div class="hero-quote">
-          "உங்கள் வார்த்தை என் கால்களுக்கு தீபமும்<br class="hidden md:block">என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது."
-        </div>
+        <div class="hero-quote">"உங்கள் வார்த்தை என் கால்களுக்கு தீபமும்<br class="hidden md:block">என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது."</div>
         <div class="hero-ref">சங்கீதம் 119:105</div>
-
         <div style="margin-top:2rem;display:flex;gap:12px;flex-wrap:wrap;">
           <button id="goReader" class="btn-primary-gold">வாசிக்க தொடங்கு</button>
           <button id="goSongs"  class="btn-gold">பாடல்கள்</button>
         </div>
       </div>
-
-      <div class="scroll-hint">
-        <span>SCROLL</span>
-        <div class="scroll-arrow"></div>
-      </div>
+      <div class="scroll-hint"><span>SCROLL</span><div class="scroll-arrow"></div></div>
     </div>
 
     <!-- HOME BODY -->
     <div class="home-body">
       <div class="max-w-4xl mx-auto">
 
-        <!-- SAINT OF THE DAY -->
+        <!-- SAINT -->
         <div class="reveal" style="margin-bottom:3rem;">
           <div class="section-label">இன்றைய புனிதர்</div>
-          <div class="saint-card p-6 md:p-8">
+          <div class="saint-card p-6 md:p-8" id="saintCard">
             <div class="md:flex gap-8 items-start">
               <div style="flex:1;">
-                <div class="saint-tag">Saint of the Day</div>
-                <div class="saint-name" id="saintName">புனித பிரகாசி</div>
-                <div class="saint-date" id="saintDate">March 17 · Feast Day</div>
-                <div class="saint-about" id="saintAbout">இது ஒரு placeholder. பின்னர் உண்மையான புனிதர் dataset இணைக்கலாம்.</div>
+                <div class="saint-tag" id="saintFeastType">Saint of the Day</div>
+                <div class="saint-name" id="saintName">—</div>
+                <div class="saint-date" id="saintDate">—</div>
+                <div class="saint-about" id="saintAbout">—</div>
                 <div style="margin-top:1rem;" id="saintActions"></div>
               </div>
               <div style="flex-shrink:0;margin-top:1.5rem;" class="md:mt-0">
-                <div style="width:120px;height:120px;border-radius:20px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;">
-                  <svg viewBox="0 0 60 80" width="40" fill="none">
-                    <rect x="24" y="0" width="12" height="80" rx="6" fill="rgba(201,168,76,0.4)"/>
-                    <rect x="0" y="20" width="60" height="12" rx="6" fill="rgba(201,168,76,0.4)"/>
-                  </svg>
+                <div style="width:120px;height:120px;border-radius:20px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                  <img id="saintPhoto" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;">
                 </div>
               </div>
             </div>
@@ -482,85 +217,265 @@
           <div class="section-label">இன்றைய வசனம்</div>
           <div class="verse-card">
             <div class="verse-text-home" id="homeVerseText">—</div>
-            <div class="verse-ref-home" id="homeVerseRef">—</div>
+            <div class="verse-ref-home"  id="homeVerseRef">—</div>
             <div style="margin-top:1.5rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
               <button id="homeRandom" class="btn-gold">✦ புதிய வசனம்</button>
               <button id="goReader2" class="btn-primary-gold" style="font-size:0.75rem;padding:8px 18px;">Bible வாசிக்க →</button>
             </div>
-      </div>
-    </div>
-    
-    <!-- JOIN US & ABOUT US (Side by Side on larger screens) -->
-    <div class="home-body pt-0 pb-16">
-      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-      
-        <!-- JOIN US -->
-        <div class="reveal">
-          <div class="section-label">Join Us</div>
-          <div class="verse-card h-full flex flex-col justify-center">
-            <h3 class="saint-name mb-3" style="font-size: 1.25rem;">தினசரி வசனம் பெற</h3>
-            <p class="saint-about mb-6 text-sm">நாங்கள் தினமும் ஒரு இறைவசனத்தை WhatsApp அல்லது Email வழியாக அனுப்புகிறோம். நீங்களும் இணைய விரும்பினால் உங்கள் விவரங்களை நிரப்பவும்.</p>
-            
-            <form class="flex flex-col gap-4" onsubmit="event.preventDefault(); alert('நன்றி! உங்கள் விவரங்கள் சமர்ப்பிக்கப்பட்டன.'); this.reset();">
-              <input type="text" placeholder="உங்கள் பெயர் (Name)" required
-                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-[rgba(201,168,76,0.2)] text-white placeholder-white/40 focus:outline-none focus:border-[var(--gold)] transition-colors text-sm"/>
-                
-              <input type="text" placeholder="WhatsApp Number / Email" required
-                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-[rgba(201,168,76,0.2)] text-white placeholder-white/40 focus:outline-none focus:border-[var(--gold)] transition-colors text-sm"/>
-                
-              <button type="submit" class="btn-primary-gold w-full mt-2">Submit</button>
-            </form>
           </div>
         </div>
 
-        <!-- ABOUT US / CONTACT US -->
-        <div class="reveal">
-          <div class="section-label">Contact Us / About Us</div>
-          <div class="verse-card h-full flex flex-col justify-center" style="padding: 1.5rem;">
-            <p class="saint-about italic mb-4 text-center">"Our motive is spreading Christ's word to the world."</p>
-            <p class="text-xs text-[rgba(201,168,76,0.8)] text-center font-bold font-['Cinzel'] tracking-wider mb-6">ST. JOSEPH'S INSTITUTE OF TECHNOLOGY (3RD YEAR)</p>
+      </div>
+    </div>
 
-            <div class="grid grid-cols-2 gap-4">
-              
-              <!-- Profile 1: Maria Peter Rufin M -->
-              <div class="flex flex-col items-center">
-                <div class="relative mb-3">
-                  <div class="w-20 h-20 rounded-full bg-white/10 border-2 border-[var(--gold)] overflow-hidden">
-                    <img src="https://media.licdn.com/dms/image/v2/D5603AQESpE2eYd0lCw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1685768822000?e=1748250000&v=beta&t=7Z3Zz5kQ8wG_K8ZkZkZkZkZkZkZkZkZkZkZkZkZkZk" alt="Maria Peter Rufin M" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23fff\' opacity=\'0.2\'><circle cx=\'50\' cy=\'50\' r=\'40\'/></svg>'">
+    <!-- ═══ CONTACT US ═══ -->
+    <div style="background:#060e18;padding:5rem 0 0;overflow:hidden;">
+
+      <!-- Heading -->
+      <div style="text-align:center;margin-bottom:3rem;padding:0 1rem;">
+        <div style="display:inline-flex;align-items:center;gap:12px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.3em;color:rgba(201,168,76,0.45);margin-bottom:1rem;">
+          <span style="display:block;width:40px;height:1px;background:rgba(201,168,76,0.3);"></span>
+          CONTACT US
+          <span style="display:block;width:40px;height:1px;background:rgba(201,168,76,0.3);"></span>
+        </div>
+        <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;color:white;letter-spacing:0.04em;margin:0 0 0.75rem;">Get In Touch</h2>
+        <p style="font-family:'Lora',serif;font-style:italic;color:rgba(255,255,255,0.3);font-size:0.9rem;margin:0;">வார்த்தையை பகிர்வோம் · தொடர்பு கொள்ளுங்கள்</p>
+      </div>
+
+      <!-- Infinite marquee -->
+      <div style="position:relative;overflow:hidden;border-top:1px solid rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.08);background:rgba(201,168,76,0.025);padding:14px 0;margin-bottom:4rem;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(to right,#060e18,transparent);z-index:2;pointer-events:none;"></div>
+        <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(to left,#060e18,transparent);z-index:2;pointer-events:none;"></div>
+        <div id="marqueeTrack" style="display:flex;white-space:nowrap;">
+          <span class="mq-item">✝ வார்த்தை வாசிப்பு</span><span class="mq-dot">·</span>
+          <span class="mq-item">TAMIL RC BIBLE</span><span class="mq-dot">·</span>
+          <span class="mq-item">கிறிஸ்துவின் வார்த்தை</span><span class="mq-dot">·</span>
+          <span class="mq-item">SPREAD THE WORD</span><span class="mq-dot">·</span>
+          <span class="mq-item">✝ SJIT 3RD YEAR</span><span class="mq-dot">·</span>
+          <span class="mq-item">சங்கீதம் 119:105</span><span class="mq-dot">·</span>
+          <span class="mq-item">✝ வார்த்தை வாசிப்பு</span><span class="mq-dot">·</span>
+          <span class="mq-item">TAMIL RC BIBLE</span><span class="mq-dot">·</span>
+          <span class="mq-item">கிறிஸ்துவின் வார்த்தை</span><span class="mq-dot">·</span>
+          <span class="mq-item">SPREAD THE WORD</span><span class="mq-dot">·</span>
+          <span class="mq-item">✝ SJIT 3RD YEAR</span><span class="mq-dot">·</span>
+          <span class="mq-item">சங்கீதம் 119:105</span><span class="mq-dot">·</span>
+          <span class="mq-item">✝ வார்த்தை வாசிப்பு</span><span class="mq-dot">·</span>
+          <span class="mq-item">TAMIL RC BIBLE</span><span class="mq-dot">·</span>
+          <span class="mq-item">கிறிஸ்துவின் வார்த்தை</span><span class="mq-dot">·</span>
+          <span class="mq-item">SPREAD THE WORD</span><span class="mq-dot">·</span>
+          <span class="mq-item">✝ SJIT 3RD YEAR</span><span class="mq-dot">·</span>
+          <span class="mq-item">சங்கீதம் 119:105</span><span class="mq-dot">·</span>
+        </div>
+      </div>
+
+      <!-- Contact cards -->
+      <div class="max-w-4xl mx-auto" style="padding:0 1rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1.25rem;margin-bottom:4rem;">
+
+          <div class="contact-card reveal">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" width="20" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="contact-label">EMAIL</div>
+            <a href="mailto:rufinmd23@gmail.com">rufinmd23@gmail.com</a>
+          </div>
+
+          <div class="contact-card reveal">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" width="20" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#C9A84C" stroke="none"/></svg>
+            </div>
+            <div class="contact-label">INSTAGRAM</div>
+            <a href="https://www.instagram.com/rufin.in/" target="_blank">@rufin.in</a>
+          </div>
+
+          <div class="contact-card reveal">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24" width="20" fill="#C9A84C"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </div>
+            <div class="contact-label">WHATSAPP</div>
+            <a href="https://wa.me/919043640793" target="_blank">+91 9043640793</a>
+          </div>
+
+          <div class="contact-card linkedin-card reveal">
+            <div class="contact-icon" style="background:rgba(0,119,181,0.12);border-color:rgba(0,119,181,0.25);">
+              <svg viewBox="0 0 24 24" width="20" fill="#0077b5"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </div>
+            <div class="contact-label" style="color:rgba(0,149,255,0.6);">LINKEDIN</div>
+            <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" style="color:rgba(100,180,255,0.8);">Maria Peter Rufin M</a>
+          </div>
+
+          <div class="contact-card linkedin-card reveal">
+            <div class="contact-icon" style="background:rgba(0,119,181,0.12);border-color:rgba(0,119,181,0.25);">
+              <svg viewBox="0 0 24 24" width="20" fill="#0077b5"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </div>
+            <div class="contact-label" style="color:rgba(0,149,255,0.6);">LINKEDIN</div>
+            <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" style="color:rgba(100,180,255,0.8);">Arockiya Alin Hino</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ ABOUT US (moved below contact) ═══ -->
+    <div style="background:#060e18;padding:1rem 1rem 5rem;border-top:1px solid rgba(201,168,76,0.06);">
+      <div class="max-w-4xl mx-auto">
+        <div class="reveal">
+          <div class="section-label">About Us</div>
+
+          <div style="background:rgba(255,255,255,0.015);border:1px solid rgba(201,168,76,0.1);border-radius:24px;padding:3rem 2.5rem;">
+
+            <!-- Mission text — no quote, real statement -->
+            <div style="max-width:640px;margin:0 auto 2.5rem;text-align:center;">
+              <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.28em;color:rgba(201,168,76,0.4);margin-bottom:1.2rem;">WHO WE ARE</div>
+              <p style="font-size:clamp(0.9rem,2vw,1.05rem);color:rgba(255,255,255,0.68);line-height:1.95;font-family:'Noto Sans Tamil',serif;">
+                We are final year students of <span style="color:rgba(201,168,76,0.85);font-weight:600;">St. Joseph's Institute of Technology</span>, pursuing our passion for faith and technology. This website was built entirely as a <span style="color:rgba(201,168,76,0.85);font-weight:600;">non-profit initiative</span> — no ads, no revenue, no agenda. Our sole purpose is to make the Holy Scripture accessible to every Tamil-speaking heart, and to spread the Word of Christ to the world.
+              </p>
+            </div>
+
+            <!-- Divider with cross -->
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:2.5rem;">
+              <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.2));"></div>
+              <span style="color:rgba(201,168,76,0.3);font-size:1.1rem;">✝</span>
+              <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,rgba(201,168,76,0.2));"></div>
+            </div>
+
+            <!-- Team — click photo → LinkedIn -->
+            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3rem;">
+
+              <!-- Member 1 -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+                <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank"
+                   title="View Maria's LinkedIn"
+                   style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;"
+                   onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                  <!-- Photo -->
+                  <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);box-shadow:0 0 0 0 rgba(201,168,76,0.2);transition:box-shadow 0.3s;"
+                       onmouseover="this.style.boxShadow='0 0 0 6px rgba(201,168,76,0.12)'" onmouseout="this.style.boxShadow='0 0 0 0 rgba(201,168,76,0.2)'">
+                    <img src="./rufin.jpeg" alt="Maria Peter Rufin M"
+                         style="width:100%;height:100%;object-fit:cover;"
+                         onerror="this.style.display='none'">
                   </div>
-                  <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#0077b5] flex items-center justify-center border border-[var(--deep)] hover:scale-110 transition-transform" title="LinkedIn">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="white"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                  </a>
+                  <!-- LinkedIn hover badge -->
+                  <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,119,181,0);display:flex;align-items:center;justify-content:center;transition:background 0.3s;"
+                       onmouseover="this.style.background='rgba(0,119,181,0.55)';this.querySelector('svg').style.opacity='1'" onmouseout="this.style.background='rgba(0,119,181,0)';this.querySelector('svg').style.opacity='0'">
+                    <svg viewBox="0 0 24 24" width="28" fill="white" style="opacity:0;transition:opacity 0.3s;">
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                  </div>
+                </a>
+                <div style="text-align:center;">
+                  <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;letter-spacing:0.05em;">Maria Peter Rufin M</div>
+                  <div style="font-size:0.62rem;color:rgba(201,168,76,0.5);margin-top:5px;font-family:'Cinzel',serif;letter-spacing:0.12em;">CO-FOUNDER & DEVELOPER</div>
                 </div>
-                <div class="text-[0.8rem] font-bold text-white text-center">Maria Peter Rufin M</div>
               </div>
 
-              <!-- Profile 2: Arockiya Alin Hino -->
-              <div class="flex flex-col items-center">
-                <div class="relative mb-3">
-                  <div class="w-20 h-20 rounded-full bg-white/10 border-2 border-[var(--gold)] overflow-hidden">
-                    <img src="https://media.licdn.com/dms/image/v2/D5603AQEMvjR9C6t4-w/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1718258759000?e=1748250000&v=beta&t=kZkZkZkZkZkZkZkZkZkZkZkZkZkZkZkZkZkZkZkZ" alt="Arockiya Alin Hino" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23fff\' opacity=\'0.2\'><circle cx=\'50\' cy=\'50\' r=\'40\'/></svg>'">
+              <!-- Member 2 -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+                <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank"
+                   title="View Alin's LinkedIn"
+                   style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;"
+                   onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                  <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);box-shadow:0 0 0 0 rgba(201,168,76,0.2);transition:box-shadow 0.3s;"
+                       onmouseover="this.style.boxShadow='0 0 0 6px rgba(201,168,76,0.12)'" onmouseout="this.style.boxShadow='0 0 0 0 rgba(201,168,76,0.2)'">
+                    <img src="./alinhino.jpeg" alt="Arockiya Alin Hino"
+                         style="width:100%;height:100%;object-fit:cover;"
+                         onerror="this.style.display='none'">
                   </div>
-                  <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#0077b5] flex items-center justify-center border border-[var(--deep)] hover:scale-110 transition-transform" title="LinkedIn">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="white"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                  </a>
+                  <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,119,181,0);display:flex;align-items:center;justify-content:center;transition:background 0.3s;"
+                       onmouseover="this.style.background='rgba(0,119,181,0.55)';this.querySelector('svg').style.opacity='1'" onmouseout="this.style.background='rgba(0,119,181,0)';this.querySelector('svg').style.opacity='0'">
+                    <svg viewBox="0 0 24 24" width="28" fill="white" style="opacity:0;transition:opacity 0.3s;">
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                  </div>
+                </a>
+                <div style="text-align:center;">
+                  <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;letter-spacing:0.05em;">Arockiya Alin Hino</div>
+                  <div style="font-size:0.62rem;color:rgba(201,168,76,0.5);margin-top:5px;font-family:'Cinzel',serif;letter-spacing:0.12em;">CO-FOUNDER & DEVELOPER</div>
                 </div>
-                <div class="text-[0.8rem] font-bold text-white text-center leading-tight">Arockiya Alin Hino</div>
               </div>
 
             </div>
+
+            <!-- Non-profit badge -->
+            <div style="margin-top:2.5rem;text-align:center;">
+              <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);border-radius:999px;padding:6px 18px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:rgba(201,168,76,0.6);">
+                ✝ NON-PROFIT · BUILT FOR CHRIST · NO ADS
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer style="background:#040b12;border-top:1px solid rgba(201,168,76,0.07);padding:3rem 1rem 2rem;">
+      <div class="max-w-4xl mx-auto">
+
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:2rem;margin-bottom:2.5rem;">
+
+          <!-- Brand -->
+          <div style="display:flex;flex-direction:column;gap:12px;max-width:230px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <svg viewBox="0 0 40 50" width="20" fill="none"><rect x="16" y="0" width="8" height="50" rx="4" fill="#C9A84C"/><rect x="0" y="12" width="40" height="8" rx="4" fill="#C9A84C"/></svg>
+              <div>
+                <div style="font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;color:white;letter-spacing:0.06em;">வார்த்தை வாசிப்பு</div>
+                <div style="font-size:0.58rem;color:rgba(201,168,76,0.4);letter-spacing:0.1em;font-family:'Cinzel',serif;">TAMIL RC BIBLE</div>
+              </div>
+            </div>
+            <p style="font-size:0.75rem;color:rgba(255,255,255,0.22);line-height:1.75;font-family:'Lora',serif;font-style:italic;">
+              Bringing the Holy Scripture to Tamil hearts, one verse at a time.
+            </p>
+          </div>
+
+          <!-- Navigate -->
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:rgba(201,168,76,0.4);margin-bottom:4px;">NAVIGATE</div>
+            <button onclick="go('home')"   style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Home</button>
+            <button onclick="go('reader')" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Reader</button>
+            <button onclick="go('songs')"  style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Songs</button>
+          </div>
+
+          <!-- Connect -->
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:rgba(201,168,76,0.4);margin-bottom:4px;">CONNECT</div>
+            <a href="mailto:varthaivaasipu@gmail.com" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Email</a>
+            <a href="https://instagram.com/varthaivaasipu" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Instagram</a>
+            <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Maria</a>
+            <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Alin</a>
+          </div>
+
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.1),transparent);margin-bottom:1.5rem;"></div>
+
+        <!-- Verse -->
+        <p style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:rgba(255,255,255,0.15);text-align:center;margin-bottom:1.5rem;line-height:1.7;">
+          "உங்கள் வார்த்தை என் கால்களுக்கு தீபமும் என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது." — சங்கீதம் 119:105
+        </p>
+
+        <!-- Copyright -->
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.15);font-family:'Cinzel',serif;letter-spacing:0.07em;">
+            © 2025 வார்த்தை வாசிப்பு · All Rights Reserved
+          </div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.1);font-family:'Cinzel',serif;letter-spacing:0.07em;">
+            BUILT WITH ✝ BY SJIT · 3RD YEAR
           </div>
         </div>
 
       </div>
-    </div>
-  </section>
+    </footer>
 
-  <!-- ═══ READER ══════════════════════════════ -->
+  </section>
+  <!-- ═══ END HOME ═══ -->
+
+  <!-- ═══ READER ═══ -->
   <section id="screen-reader" class="hidden" style="padding-top:72px;">
     <div class="reader-bg">
       <div class="max-w-7xl mx-auto">
-
         <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
           <div>
             <h2 style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:600;color:#1E293B;">Reader</h2>
@@ -573,9 +488,7 @@
             <button id="debugBtn"     class="px-3 py-2 rounded-2xl bg-gray-800 text-white font-extrabold text-xs">Debug</button>
           </div>
         </div>
-
         <div id="debugBox" class="hidden mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-600 leading-relaxed"></div>
-
         <div id="hlColors" class="hidden mb-3 p-3 rounded-2xl bg-yellow-50 border border-yellow-100 flex items-center gap-2 flex-wrap">
           <span class="text-xs font-extrabold text-gray-700">நிறம்:</span>
           <button class="w-7 h-7 rounded-lg bg-yellow-300" data-color="#FDE047"></button>
@@ -584,8 +497,6 @@
           <button class="w-7 h-7 rounded-lg bg-pink-300"   data-color="#F472B6"></button>
           <button class="w-7 h-7 rounded-lg bg-red-200"    data-color="#FECACA"></button>
         </div>
-
-        <!-- Book lists -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
             <div class="flex items-center justify-between mb-3">
@@ -602,10 +513,7 @@
             <div id="ntList" class="max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
           </div>
         </div>
-
-        <!-- Two panel -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
           <div class="lg:col-span-3 flex flex-col gap-3">
             <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
               <div class="flex items-center justify-between mb-1">
@@ -623,7 +531,6 @@
               </div>
             </div>
           </div>
-
           <div class="lg:col-span-9 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div>
@@ -631,8 +538,6 @@
                 <div class="text-xs text-gray-500 mt-0.5" id="readingTitle">புத்தகம் திறந்து வாசிக்கத் தொடங்குங்கள்</div>
               </div>
             </div>
-
-            <!-- Audio player -->
             <div id="audioPlayer" class="audio-player hidden">
               <div class="flex items-center justify-between mb-2">
                 <div class="min-w-0">
@@ -668,7 +573,6 @@
               </div>
               <p class="text-xs mt-2" style="color:rgba(255,255,255,0.3)">▶ Play → ஒவ்வொரு வசனமாக தமிழில் படிக்கும் · வசன எண் click → அந்த இடத்திலிருந்து தொடங்கும்</p>
             </div>
-
             <div id="verseBox" class="verse-box scrollbar-reader" style="height:58vh;font-size:1.05rem;">
               <div class="text-gray-400 text-center mt-10">ஒரு புத்தகம் "Open" செய்யுங்கள்.</div>
             </div>
@@ -679,12 +583,12 @@
     </div>
   </section>
 
-  <!-- ═══ SONGS ═══════════════════════════════ -->
+  <!-- ═══ SONGS ═══ -->
   <section id="screen-songs" class="hidden" style="padding-top:72px;">
     <div class="songs-bg">
       <div class="max-w-3xl mx-auto">
         <h2 style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:600;color:#1E293B;margin-bottom:4px;">Songs</h2>
-        <p style="font-size:0.8rem;color:#94A3B8;margin-bottom:1.5rem;">பாடல்கள் தேடல் (local mock).</p>
+        <p style="font-size:0.8rem;color:#94A3B8;margin-bottom:1.5rem;">பாடல்கள் தேடல்.</p>
         <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
           <div class="flex gap-2">
             <input id="songQ" class="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-sm" placeholder="Song பெயர் / lyric தேடுங்கள்..."/>
@@ -697,9 +601,10 @@
     </div>
   </section>
 
-</div><!-- end #app -->
+</div>
 
 <script src="./js/saints-loader.js"></script>
 <script src="./js/app.js"></script>
+<script src="./js/bible-ai-guide.js"></script>
 </body>
 </html>
