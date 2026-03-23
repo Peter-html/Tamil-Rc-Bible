@@ -189,9 +189,27 @@ async function loadBook(bookNum) {
 }
 
 /* =========================================================
-   SAINT OF THE DAY
-   (Removed mock data and redundant loader. Handled by saints-loader.js)
+   SAINT OF THE DAY — mock data (replace with real API later)
 ========================================================= */
+const SAINTS = [
+  { name:"புனித பாட்ரிக்", date:"March 17 · Feast Day", about:"அயர்லாந்தின் பாதுகாவலர். அவர் கிரேக்கோ-ரோமன் கிறிஸ்தவ கலாச்சாரத்தை அயர்லாந்துக்கு கொண்டு வந்தார். அவரது விசுவாசம் மலைகளையும் சாதனைகளையும் தாண்டியது.", actions:["ஆயிரக்கணக்கான மக்களை திருமுழுக்காட்டினார்","கடத்தப்பட்டு அடிமையாக வாழ்ந்தார், பின் மீண்டார்","அயர்லாந்தில் பல தேவாலயங்கள் நிறுவினார்"] },
+  { name:"புனித ஜோசப்", date:"March 19 · Feast Day", about:"இயேசுவின் வளர்ப்பு தந்தை. நம்பகமான பாதுகாவலர், கைவேலையாளர். கடவுளின் திட்டத்தில் மறைவான ஆனால் மிக முக்கியமான பாத்திரம்.", actions:["மரியாள் மற்றும் இயேசுவை பாதுகாத்தார்","எகிப்துக்கு தப்பி ஓடினார்","நம்பகமான கைவேலையாளர்"] },
+  { name:"புனித தெரேசா", date:"October 1 · Feast Day", about:"சிறிய பூக்களின் புனிதர். சிறிய வழியில் கடவுளை நோக்கி நடந்தார். அன்பின் மூலம் பரலோகம் வரை செல்லும் பாதை காட்டினார்.", actions:["அன்பின் சிறிய வழியை போதித்தார்","மிஷனரிகளுக்கு பிரார்த்தித்தார்","இளமையிலேயே வீரத்துடன் இறந்தார்"] },
+];
+
+function loadSaintOfDay() {
+  const today = new Date().getDay();
+  const s = SAINTS[today % SAINTS.length];
+  setText("saintName", s.name);
+  setText("saintDate", s.date);
+  setText("saintAbout", s.about);
+  const actionsEl = $("saintActions");
+  if (actionsEl) {
+    actionsEl.innerHTML = s.actions.map(a =>
+      `<span class="saint-action-pill">${escapeHTML(a)}</span>`
+    ).join("");
+  }
+}
 
 /* =========================================================
    BOOK LISTS
@@ -235,7 +253,10 @@ async function renderBookLists() {
     });
   });
 
-  // (Removed mass loadBook call here to prevent network flood on page load)
+  [...otBooks, ...ntBooks].forEach(async b => {
+    try { const p = await loadBook(b.bookNum); updateChapterCountUI(b.bookNum, p.chapterCount); }
+    catch { updateChapterCountUI(b.bookNum, 0); }
+  });
 }
 
 function updateChapterCountUI(bookNum, count) {
@@ -292,7 +313,7 @@ async function renderChapter(ch) {
   const p = await loadBook(currentBook.bookNum);
   const verses = p.versesByChapter.get(ch) || [];
   ttsVerses = verses; ttsCurrentIdx = 0;
-
+  if (typeof BibleAI !== "undefined") BibleAI.onChapterOpen(currentBook.name_ta, ch, verses, currentBook.bookNum);
   setText("chapterTitle", `${currentBook.name_ta} ${ch}`);
   setText("readingTitle", `${currentBook.name_ta} ${ch} அதிகாரம்`);
   setText("audioChapterLabel", `${currentBook.name_ta} அதிகாரம் ${ch}`);
@@ -458,21 +479,14 @@ const pickRandom = arr => arr[Math.floor(Math.random()*arr.length)];
 
 async function setHomeRandomVerse() {
   try {
-    // Pick a completely random verse from the entire bible if booksOrder exists
-    if (booksOrder) {
-      const allBooks = [...booksOrder.old_testament, ...booksOrder.deuterocanon, ...booksOrder.new_testament];
-      const randomBook = pickRandom(allBooks);
-      const p = await loadBook(randomBook.bookNum);
-      if (p && p.chapterCount > 0) {
-        // pick random chapter
-        const randomChapter = Math.floor(Math.random() * p.chapterCount) + 1;
-        const verses = p.versesByChapter.get(randomChapter) || [];
-        if (verses.length > 0) {
-          const v = pickRandom(verses);
-          setText("homeVerseText", `"${v.t}"`);
-          setText("homeVerseRef", `— ${randomBook.name_ta} ${randomChapter}:${v.v}`);
-          return;
-        }
+    if (currentBook) {
+      const p = await loadBook(currentBook.bookNum);
+      const verses = p.versesByChapter.get(currentChapter) || [];
+      if (verses.length) {
+        const v = pickRandom(verses);
+        setText("homeVerseText", `"${v.t}"`);
+        setText("homeVerseRef", `— ${currentBook.name_ta} ${currentChapter}:${v.v}`);
+        return;
       }
     }
     // Fallback inspiring verse
@@ -592,6 +606,7 @@ function wireUI() {
 (async function init() {
   wireUI();
   ttsInit();
+  loadSaintOfDay();
 
   try {
     booksOrder = await loadBooksOrder();
