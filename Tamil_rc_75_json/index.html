@@ -4,6 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tamil RC Bible – இறைவசனம்</title>
+
+  <!-- ════ FAVICON — SVG cross, works in all modern browsers ════ -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='13' y='2' width='6' height='28' rx='3' fill='%23C9A84C'/%3E%3Crect x='4' y='9' width='24' height='6' rx='3' fill='%23C9A84C'/%3E%3C/svg%3E">
+  <!-- Fallback PNG favicon for Safari/iOS (optional — works without it) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='13' y='2' width='6' height='28' rx='3' fill='%23C9A84C'/%3E%3Crect x='4' y='9' width='24' height='6' rx='3' fill='%23C9A84C'/%3E%3C/svg%3E">
+
   <meta name="description" content="Read the Tamil RC Bible online with audio, verse navigation, and Ask Bible support. இறைவசனம் – Tamil RC Bible for prayer and daily reading.">
   <meta property="og:site_name" content="Tamil RC Bible – இறைவசனம்">
   <meta name="robots" content="index,follow">
@@ -99,10 +105,21 @@
     .pill { font-size:12px; padding:3px 10px; border-radius:999px; background:#F1F5F9; color:#334155; font-weight:700; }
     .book-row { border:1px solid #E5E7EB; border-radius:16px; padding:10px 12px; background:white; transition:all 0.15s; }
     .book-row:hover { box-shadow:0 8px 20px rgba(0,0,0,0.07); transform:translateY(-1px); }
-    .chapter-btn { width:40px; height:40px; border-radius:12px; border:1.5px solid #E5E7EB; background:white; font-weight:800; font-size:13px; cursor:pointer; transition:all 0.12s; }
+
+    /* ── Chapter buttons: 44px minimum touch target ── */
+    .chapter-btn {
+      width:44px; height:44px;
+      border-radius:12px; border:1.5px solid #E5E7EB;
+      background:white; font-weight:800; font-size:13px;
+      cursor:pointer; transition:all 0.12s;
+      /* Prevent iOS tap-highlight flicker */
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
     .chapter-btn:hover { background:#EFF6FF; border-color:#93C5FD; }
     .chapter-btn.active { background:#2563EB; color:white; border-color:#2563EB; box-shadow:0 4px 12px rgba(37,99,235,0.3); }
-    .verse-chip { display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:30px; padding:0 8px; border-radius:8px; border:1px solid #E5E7EB; background:#F8FAFF; font-size:12px; font-weight:700; color:#4B5563; cursor:pointer; transition:all 0.1s; }
+
+    .verse-chip { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:32px; padding:0 8px; border-radius:8px; border:1px solid #E5E7EB; background:#F8FAFF; font-size:12px; font-weight:700; color:#4B5563; cursor:pointer; transition:all 0.1s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
     .verse-chip:hover { background:#DBEAFE; border-color:#93C5FD; color:#1D4ED8; }
     .verse-chip.tts-active-chip { background:#FEF3C7; border-color:#F59E0B; color:#92400E; }
     .verse-para { transition:background 0.25s ease,border-left 0.25s ease,padding-left 0.25s; border-left:3px solid transparent; border-radius:10px; padding:5px 8px; margin-bottom:10px; line-height:1.95; }
@@ -112,12 +129,12 @@
     .scrollbar-reader::-webkit-scrollbar-track { background:#EEF2FF; border-radius:999px; }
     .scrollbar-reader::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:999px; }
     .audio-player { background:linear-gradient(135deg,#1a2f4e,#0d1b2e); border-radius:18px; padding:12px 14px; color:white; border:1px solid rgba(255,255,255,0.08); }
-    .audio-btn { border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.12s,background 0.12s; flex-shrink:0; }
+    .audio-btn { border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.12s,background 0.12s; flex-shrink:0; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
     .audio-btn:hover { transform:scale(1.1); }
     .audio-btn:active { transform:scale(0.93); }
-    .audio-btn-play  { width:46px; height:46px; background:#F59E0B; color:white; box-shadow:0 4px 14px rgba(245,158,11,0.4); }
-    .audio-btn-pause { width:46px; height:46px; background:#F59E0B; color:white; }
-    .audio-btn-sm    { width:34px; height:34px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); }
+    .audio-btn-play  { width:50px; height:50px; background:#F59E0B; color:white; box-shadow:0 4px 14px rgba(245,158,11,0.4); }
+    .audio-btn-pause { width:50px; height:50px; background:#F59E0B; color:white; }
+    .audio-btn-sm    { width:44px; height:44px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); }
     .audio-btn-sm:hover { background:rgba(255,255,255,0.22); }
     .audio-speed-select { background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:4px 8px; font-size:12px; font-weight:700; cursor:pointer; }
     .audio-speed-select option { background:#1a2f4e; }
@@ -139,6 +156,179 @@
     .contact-card a:hover { color:#E8C97A; }
     .contact-icon { width:44px; height:44px; border-radius:13px; background:rgba(201,168,76,0.09); border:1px solid rgba(201,168,76,0.18); display:flex; align-items:center; justify-content:center; }
     .contact-label { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.2em; color:rgba(201,168,76,0.45); }
+
+    /* ════════════════════════════════════════════════
+       MOBILE BREADCRUMB — sticky "Now Reading" bar
+       Shows below header after a chapter is opened.
+       Hidden on desktop (lg+).
+    ════════════════════════════════════════════════ */
+    #mobileBreadcrumb {
+      display: none; /* shown by JS when chapter opens */
+      position: sticky;
+      top: 72px; /* sits just below the fixed header */
+      z-index: 50;
+      background: #1e3a5f;
+      border-bottom: 1px solid rgba(201,168,76,0.25);
+      padding: 10px 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    @media (min-width: 1024px) {
+      #mobileBreadcrumb { display: none !important; } /* desktop never needs it */
+    }
+    #mbLabel {
+      font-family:'Cinzel',serif;
+      font-size:0.78rem;
+      font-weight:700;
+      color:#E8C97A;
+      letter-spacing:0.04em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      flex:1;
+      min-width:0;
+    }
+    #mbCount {
+      font-size:0.65rem;
+      color:rgba(201,168,76,0.55);
+      font-family:'Cinzel',serif;
+      white-space:nowrap;
+    }
+    #mbJump {
+      background:#C9A84C;
+      color:#0d1b2a;
+      border:none;
+      border-radius:999px;
+      padding:7px 14px;
+      font-family:'Cinzel',serif;
+      font-size:0.65rem;
+      font-weight:800;
+      letter-spacing:0.05em;
+      cursor:pointer;
+      white-space:nowrap;
+      flex-shrink:0;
+      min-height:36px;
+      touch-action:manipulation;
+    }
+
+    /* ════════════════════════════════════════════════
+       MOBILE READER — verse box fills available height
+    ════════════════════════════════════════════════ */
+    /*
+  ============================================================
+  index.html  — CSS replacement
+  
+  Find the ENTIRE block that starts with:
+    @media (max-width: 1023px) {
+      /* Book lists: taller on mobile ...
+  
+  And ends just before:
+    /* ════════════════════════════════════════════════
+       STEP INDICATOR ...
+  
+  Replace that whole block with the CSS below.
+  ============================================================
+*/
+
+@media (max-width: 1023px) {
+  /* ── Book lists ── */
+  #otList, #ntList { max-height: 60vh !important; }
+
+  /* ── VERSE BOX ─────────────────────────────────────────
+     Fixed height so the box never grows taller than the
+     visible screen.  The page itself stays still while the
+     user reads — only the box interior scrolls.
+  ── */
+  #verseBox {
+    /* dvh = dynamic viewport height (accounts for browser chrome) */
+    height: calc(100dvh - 72px - 56px - 170px) !important;
+    min-height: 38vh !important;
+    max-height: none !important;
+    overscroll-behavior: contain;      /* no page bounce */
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);          /* GPU layer → smooth scroll */
+  }
+
+  /* ── CHAPTER STRIP — horizontal swipe only ── */
+  #chapters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-height: none !important;
+    gap: 6px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /*
+      touch-action: pan-x tells the browser this element
+      only handles horizontal swipes.  Vertical swipes pass
+      through to the page — so the page CAN be scrolled by
+      swiping over the chapter strip.
+    */
+    touch-action: pan-x;
+  }
+  #chapters::-webkit-scrollbar { display: none; }
+  #chapters .chapter-btn { flex-shrink: 0; }
+
+  /* ── VERSE CHIPS STRIP — same treatment ── */
+  #verseChips {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-height: none !important;
+    gap: 6px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  #verseChips::-webkit-scrollbar { display: none; }
+  #verseChips .verse-chip { flex-shrink: 0; }
+
+  /* ── AUDIO PLAYER ───────────────────────────────────────
+     Was "sticky bottom" which caused the page to snap down
+     whenever audio updated.  Now it's a normal static card
+     that sits naturally at the bottom of the reader column.
+  ── */
+  #audioPlayer {
+    position: static !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+    touch-action: auto !important;
+  }
+
+  /* Bigger touch targets */
+  .audio-btn-sm { width: 48px !important; height: 48px !important; }
+  .audio-btn-play,
+  .audio-btn-pause { width: 56px !important; height: 56px !important; }
+}
+
+    /* ════════════════════════════════════════════════
+       STEP INDICATOR — shows which wizard step is active
+       (Book → Chapter → Reading)
+    ════════════════════════════════════════════════ */
+    .reader-step-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:#EFF6FF;
+      border:1.5px solid #BFDBFE;
+      border-radius:999px;
+      padding:4px 12px;
+      font-size:0.7rem;
+      font-weight:800;
+      color:#1D4ED8;
+      font-family:'Cinzel',serif;
+      letter-spacing:0.04em;
+    }
+    .reader-step-badge .step-dot {
+      width:6px; height:6px; border-radius:50%; background:#2563EB;
+    }
   </style>
 </head>
 <body>
@@ -178,8 +368,8 @@
       </nav>
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-1" style="background:rgba(255,255,255,0.08);border-radius:10px;padding:4px 6px;">
-          <button id="aMinus" style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;">A−</button>
-          <button id="aPlus"  style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;">A+</button>
+          <button id="aMinus" style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;min-height:36px;">A−</button>
+          <button id="aPlus"  style="padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;cursor:pointer;font-weight:700;font-size:13px;min-height:36px;">A+</button>
         </div>
       </div>
     </div>
@@ -212,8 +402,6 @@
     <!-- HOME BODY — Saint + Verse of Day -->
     <div class="home-body">
       <div class="max-w-4xl mx-auto">
-
-        <!-- SAINT OF THE DAY -->
         <div class="reveal" style="margin-bottom:3rem;">
           <div class="section-label">இன்றைய புனிதர்</div>
           <div class="verse-card" id="saintCard" style="position:relative;">
@@ -234,8 +422,6 @@
             </div>
           </div>
         </div>
-
-        <!-- WORD OF THE DAY -->
         <div class="reveal">
           <div class="section-label">இன்றைய வசனம்</div>
           <div class="verse-card">
@@ -247,15 +433,10 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
-    <!-- END HOME BODY -->
 
-    <!-- ═══ BOTTOM SECTION (dark) ═══ -->
     <div style="background:#060e18;padding:5rem 0 0;overflow:hidden;">
-
-      <!-- CONTACT HEADING + MARQUEE -->
       <div style="text-align:center;margin-bottom:3rem;padding:0 1rem;">
         <div style="display:inline-flex;align-items:center;gap:12px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.3em;color:rgba(201,168,76,0.45);margin-bottom:1rem;">
           <span style="display:block;width:40px;height:1px;background:rgba(201,168,76,0.3);"></span>
@@ -265,8 +446,6 @@
         <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;color:white;letter-spacing:0.04em;margin:0 0 0.75rem;">Get In Touch</h2>
         <p style="font-family:'Lora',serif;font-style:italic;color:rgba(255,255,255,0.3);font-size:0.9rem;margin:0;">வார்த்தையை பகிர்வோம் · தொடர்பு கொள்ளுங்கள்</p>
       </div>
-
-      <!-- MARQUEE -->
       <div style="position:relative;overflow:hidden;border-top:1px solid rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.08);background:rgba(201,168,76,0.025);padding:14px 0;margin-bottom:4rem;">
         <div style="position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(to right,#060e18,transparent);z-index:2;pointer-events:none;"></div>
         <div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(to left,#060e18,transparent);z-index:2;pointer-events:none;"></div>
@@ -291,251 +470,201 @@
           <span class="mq-item">சங்கீதம் 119:105</span><span class="mq-dot">·</span>
         </div>
       </div>
-
-      <!-- ═══ ABOUT US ═══ -->
       <div style="padding:0 1rem 4rem;">
         <div class="max-w-4xl mx-auto">
           <div class="reveal">
             <div class="section-label">About Us</div>
             <div style="background:rgba(255,255,255,0.015);border:1px solid rgba(201,168,76,0.1);border-radius:24px;padding:3rem 2.5rem;">
-
-              <!-- Mission -->
               <div style="max-width:640px;margin:0 auto 2.5rem;text-align:center;">
                 <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.28em;color:rgba(201,168,76,0.4);margin-bottom:1.2rem;">WHO WE ARE</div>
                 <p style="font-size:clamp(0.9rem,2vw,1.05rem);color:rgba(255,255,255,0.68);line-height:1.95;font-family:'Noto Sans Tamil',serif;">
-                  We are final year students of <span style="color:rgba(201,168,76,0.85);font-weight:600;">St. Joseph's Institute of Technology</span>, pursuing our passion for faith and technology. This website was built entirely as a <span style="color:rgba(201,168,76,0.85);font-weight:600;">non-profit initiative</span> — no ads, no revenue, no agenda. Our sole purpose is to make the Holy Scripture accessible to every Tamil-speaking heart, and to spread the Word of Christ to the world.
+                  We are final year students of <span style="color:rgba(201,168,76,0.85);font-weight:600;">St. Joseph's Institute of Technology</span>, pursuing our passion for faith and technology. This website was built entirely as a <span style="color:rgba(201,168,76,0.85);font-weight:600;">non-profit initiative</span> — no ads, no revenue, no agenda.
                 </p>
               </div>
-
-              <!-- Divider -->
               <div style="display:flex;align-items:center;gap:16px;margin-bottom:2.5rem;">
                 <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.2));"></div>
                 <span style="color:rgba(201,168,76,0.3);font-size:1.1rem;">✝</span>
                 <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,rgba(201,168,76,0.2));"></div>
               </div>
-
-              <!-- Team -->
               <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3rem;">
-
-                <!-- Member 1 -->
                 <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-                  <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank"
-                     title="View Maria's LinkedIn"
-                     style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;"
-                     onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);box-shadow:0 0 0 0 rgba(201,168,76,0.2);transition:box-shadow 0.3s;"
-                         onmouseover="this.style.boxShadow='0 0 0 6px rgba(201,168,76,0.12)'" onmouseout="this.style.boxShadow='0 0 0 0 rgba(201,168,76,0.2)'">
+                  <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);">
                       <img src="./rufin.jpeg" alt="Maria Peter Rufin M" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
                     </div>
-                    <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,119,181,0);display:flex;align-items:center;justify-content:center;transition:background 0.3s;"
-                         onmouseover="this.style.background='rgba(0,119,181,0.55)';this.querySelector('svg').style.opacity='1'" onmouseout="this.style.background='rgba(0,119,181,0)';this.querySelector('svg').style.opacity='0'">
-                      <svg viewBox="0 0 24 24" width="28" fill="white" style="opacity:0;transition:opacity 0.3s;">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                      </svg>
-                    </div>
                   </a>
                   <div style="text-align:center;">
-                    <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;letter-spacing:0.05em;">Maria Peter Rufin M</div>
+                    <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;">Maria Peter Rufin M</div>
                     <div style="font-size:0.62rem;color:rgba(201,168,76,0.5);margin-top:5px;font-family:'Cinzel',serif;letter-spacing:0.12em;">CO-FOUNDER & DEVELOPER</div>
                   </div>
                 </div>
-
-                <!-- Member 2 -->
                 <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-                  <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank"
-                     title="View Alin's LinkedIn"
-                     style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;"
-                     onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);box-shadow:0 0 0 0 rgba(201,168,76,0.2);transition:box-shadow 0.3s;"
-                         onmouseover="this.style.boxShadow='0 0 0 6px rgba(201,168,76,0.12)'" onmouseout="this.style.boxShadow='0 0 0 0 rgba(201,168,76,0.2)'">
+                  <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" style="display:block;position:relative;cursor:pointer;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);">
                       <img src="./alinhino.jpeg" alt="Arockiya Alin Hino" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
                     </div>
-                    <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,119,181,0);display:flex;align-items:center;justify-content:center;transition:background 0.3s;"
-                         onmouseover="this.style.background='rgba(0,119,181,0.55)';this.querySelector('svg').style.opacity='1'" onmouseout="this.style.background='rgba(0,119,181,0)';this.querySelector('svg').style.opacity='0'">
-                      <svg viewBox="0 0 24 24" width="28" fill="white" style="opacity:0;transition:opacity 0.3s;">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                      </svg>
-                    </div>
                   </a>
                   <div style="text-align:center;">
-                    <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;letter-spacing:0.05em;">Arockiya Alin Hino</div>
+                    <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:600;color:white;">Arockiya Alin Hino</div>
                     <div style="font-size:0.62rem;color:rgba(201,168,76,0.5);margin-top:5px;font-family:'Cinzel',serif;letter-spacing:0.12em;">CO-FOUNDER & DEVELOPER</div>
                   </div>
                 </div>
-
               </div>
-
-              <!-- Non-profit badge -->
               <div style="margin-top:2.5rem;text-align:center;">
                 <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);border-radius:999px;padding:6px 18px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:rgba(201,168,76,0.6);">
                   ✝ NON-PROFIT · BUILT FOR CHRIST · NO ADS
                 </span>
               </div>
-
             </div>
           </div>
         </div>
       </div>
-      <!-- END ABOUT US -->
-
-      <!-- ═══ CONTACT CARDS — Email & WhatsApp only ═══ -->
       <div style="padding:0 1rem 5rem;">
         <div class="max-w-4xl mx-auto">
           <div style="display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;">
-
-            <!-- Email -->
             <div class="contact-card reveal" style="min-width:200px;max-width:240px;">
-              <div class="contact-icon">
-                <svg viewBox="0 0 24 24" width="20" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </div>
+              <div class="contact-icon"><svg viewBox="0 0 24 24" width="20" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
               <div class="contact-label">EMAIL</div>
               <a href="mailto:rufinmd23@gmail.com">rufinmd23@gmail.com</a>
             </div>
-
-            <!-- WhatsApp -->
             <div class="contact-card reveal" style="min-width:200px;max-width:240px;">
-              <div class="contact-icon">
-                <svg viewBox="0 0 24 24" width="20" fill="#C9A84C">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-              </div>
+              <div class="contact-icon"><svg viewBox="0 0 24 24" width="20" fill="#C9A84C"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
               <div class="contact-label">WHATSAPP</div>
               <a href="https://wa.me/919443140793" target="_blank">+91 9443140793</a>
             </div>
-
           </div>
         </div>
       </div>
-      <!-- END CONTACT CARDS -->
-
     </div>
-    <!-- END DARK SECTION -->
 
-    <!-- ═══ FOOTER ═══ -->
     <footer style="background:#040b12;border-top:1px solid rgba(201,168,76,0.07);padding:3rem 1rem 2rem;">
       <div class="max-w-4xl mx-auto">
-
         <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:2rem;margin-bottom:2.5rem;">
-
-          <!-- Brand -->
           <div style="display:flex;flex-direction:column;gap:12px;max-width:230px;">
             <div style="display:flex;align-items:center;gap:12px;">
               <svg viewBox="0 0 40 50" width="20" fill="none"><rect x="16" y="0" width="8" height="50" rx="4" fill="#C9A84C"/><rect x="0" y="12" width="40" height="8" rx="4" fill="#C9A84C"/></svg>
               <div>
-                <div style="font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;color:white;letter-spacing:0.06em;">இறைவசனம்</div>
+                <div style="font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;color:white;">இறைவசனம்</div>
                 <div style="font-size:0.58rem;color:rgba(201,168,76,0.4);letter-spacing:0.1em;font-family:'Cinzel',serif;">TAMIL RC BIBLE</div>
               </div>
             </div>
-            <p style="font-size:0.75rem;color:rgba(255,255,255,0.22);line-height:1.75;font-family:'Lora',serif;font-style:italic;">
-              Bringing the Holy Scripture to Tamil hearts, one verse at a time.
-            </p>
+            <p style="font-size:0.75rem;color:rgba(255,255,255,0.22);line-height:1.75;font-family:'Lora',serif;font-style:italic;">Bringing the Holy Scripture to Tamil hearts, one verse at a time.</p>
           </div>
-
-          <!-- Navigate -->
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:rgba(201,168,76,0.4);margin-bottom:4px;">NAVIGATE</div>
-            <button onclick="go('home')"   style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Home</button>
-            <button onclick="go('reader')" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Reader</button>
-            <button onclick="go('songs')"  style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Songs</button>
+            <button onclick="go('home')"   style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;min-height:36px;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Home</button>
+            <button onclick="go('reader')" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;min-height:36px;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Reader</button>
+            <button onclick="go('songs')"  style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Cinzel',serif;letter-spacing:0.08em;cursor:pointer;text-align:left;min-height:36px;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Songs</button>
           </div>
-
-          <!-- Connect -->
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:rgba(201,168,76,0.4);margin-bottom:4px;">CONNECT</div>
-            <a href="mailto:rufinmd23@gmail.com" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Email</a>
-            <a href="https://wa.me/919443140793" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">WhatsApp</a>
-            <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Maria</a>
-            <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Alin</a>
+            <a href="mailto:rufinmd23@gmail.com" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Email</a>
+            <a href="https://wa.me/919443140793" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">WhatsApp</a>
+            <a href="https://www.linkedin.com/in/maria-peter-rufin/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Maria</a>
+            <a href="https://www.linkedin.com/in/arockiya-alin-hino-33693a2b0/" target="_blank" style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;" onmouseover="this.style.color='#E8C97A'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">LinkedIn — Alin</a>
           </div>
-
         </div>
-
-        <!-- Divider -->
         <div style="height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.1),transparent);margin-bottom:1.5rem;"></div>
-
-        <!-- Verse -->
-        <p style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:rgba(255,255,255,0.15);text-align:center;margin-bottom:1.5rem;line-height:1.7;">
-          "உங்கள் வார்த்தை என் கால்களுக்கு தீபமும் என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது." — சங்கீதம் 119:105
-        </p>
-
-        <!-- Copyright -->
+        <p style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:rgba(255,255,255,0.15);text-align:center;margin-bottom:1.5rem;line-height:1.7;">"உங்கள் வார்த்தை என் கால்களுக்கு தீபமும் என் பாதைக்கு வெளிச்சமுமாயிருக்கிறது." — சங்கீதம் 119:105</p>
         <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
-          <div style="font-size:0.68rem;color:rgba(255,255,255,0.15);font-family:'Cinzel',serif;letter-spacing:0.07em;">
-            © 2025 இறைவசனம் · All Rights Reserved
-          </div>
-          <div style="font-size:0.68rem;color:rgba(255,255,255,0.1);font-family:'Cinzel',serif;letter-spacing:0.07em;">
-            BUILT WITH ✝ BY SJIT · 3RD YEAR
-          </div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.15);font-family:'Cinzel',serif;">© 2025 இறைவசனம் · All Rights Reserved</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.1);font-family:'Cinzel',serif;">BUILT WITH ✝ BY SJIT · 3RD YEAR</div>
         </div>
-
       </div>
     </footer>
 
   </section>
-  <!-- ═══ END HOME ═══ -->
 
   <!-- ═══ READER ═══ -->
   <section id="screen-reader" class="hidden" style="padding-top:72px;">
+
+    <!-- ════ MOBILE STICKY BREADCRUMB ════
+         Appears below the header the moment a chapter is opened.
+         Shows "BookName · Chapter N | 30 வசனங்கள் | ▶ Jump to Reading"
+         Hidden on lg+ (desktop) via CSS.
+    ════ -->
+    <div id="mobileBreadcrumb">
+      <div style="min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;">
+        <div id="mbLabel">—</div>
+        <div id="mbCount">—</div>
+      </div>
+      <button id="mbJump">▼ Reading</button>
+    </div>
+
     <div class="reader-bg">
       <div class="max-w-7xl mx-auto">
         <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
           <div>
             <h2 style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:600;color:#1E293B;">Reader</h2>
-            <p style="font-size:0.75rem;color:#94A3B8;margin-top:2px;">புத்தகம் → அதிகாரம் → வாசிப்பு</p>
+            <p style="font-size:0.75rem;color:#94A3B8;margin-top:2px;">
+              <!-- Mobile: step guide  Desktop: subtitle -->
+              <span class="lg:hidden">① புத்தகம் Open → ② அதிகாரம் தொடு → ③ கீழே வாசி</span>
+              <span class="hidden lg:inline">புத்தகம் → அதிகாரம் → வாசிப்பு</span>
+            </p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
-            <button id="hlToggle"     class="px-3 py-2 rounded-2xl bg-yellow-100 text-yellow-800 font-extrabold text-xs">✏️ Highlight</button>
-            <button id="hlClear"      class="px-3 py-2 rounded-2xl bg-gray-100 text-gray-700 font-extrabold text-xs">Clear</button>
-            <button id="readerRandom" class="px-3 py-2 rounded-2xl bg-orange-100 text-orange-700 font-extrabold text-xs">🎲 Random</button>
-            <button id="debugBtn"     class="px-3 py-2 rounded-2xl bg-gray-800 text-white font-extrabold text-xs">Debug</button>
+            <button id="hlToggle"     class="px-3 py-2 rounded-2xl bg-yellow-100 text-yellow-800 font-extrabold text-xs" style="min-height:44px;">✏️ Highlight</button>
+            <button id="hlClear"      class="px-3 py-2 rounded-2xl bg-gray-100 text-gray-700 font-extrabold text-xs"   style="min-height:44px;">Clear</button>
+            <button id="readerRandom" class="px-3 py-2 rounded-2xl bg-orange-100 text-orange-700 font-extrabold text-xs" style="min-height:44px;">🎲 Random</button>
+            <button id="debugBtn"     class="px-3 py-2 rounded-2xl bg-gray-800 text-white font-extrabold text-xs"       style="min-height:44px;">Debug</button>
           </div>
         </div>
         <div id="debugBox" class="hidden mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-600 leading-relaxed"></div>
         <div id="hlColors" class="hidden mb-3 p-3 rounded-2xl bg-yellow-50 border border-yellow-100 flex items-center gap-2 flex-wrap">
           <span class="text-xs font-extrabold text-gray-700">நிறம்:</span>
-          <button class="w-7 h-7 rounded-lg bg-yellow-300" data-color="#FDE047"></button>
-          <button class="w-7 h-7 rounded-lg bg-green-300"  data-color="#86EFAC"></button>
-          <button class="w-7 h-7 rounded-lg bg-blue-300"   data-color="#93C5FD"></button>
-          <button class="w-7 h-7 rounded-lg bg-pink-300"   data-color="#F472B6"></button>
-          <button class="w-7 h-7 rounded-lg bg-red-200"    data-color="#FECACA"></button>
+          <button class="w-8 h-8 rounded-lg bg-yellow-300" data-color="#FDE047"></button>
+          <button class="w-8 h-8 rounded-lg bg-green-300"  data-color="#86EFAC"></button>
+          <button class="w-8 h-8 rounded-lg bg-blue-300"   data-color="#93C5FD"></button>
+          <button class="w-8 h-8 rounded-lg bg-pink-300"   data-color="#F472B6"></button>
+          <button class="w-8 h-8 rounded-lg bg-red-200"    data-color="#FECACA"></button>
         </div>
+
+        <!-- Book lists — taller on mobile via CSS override above -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
             <div class="flex items-center justify-between mb-3">
               <div class="font-extrabold text-gray-800">பழைய ஏற்பாடு</div>
               <span class="pill">OT · 48</span>
             </div>
-            <div id="otList" class="max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
+            <div id="otList" class="max-h-52 lg:max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
           </div>
           <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
             <div class="flex items-center justify-between mb-3">
               <div class="font-extrabold text-gray-800">புதிய ஏற்பாடு</div>
               <span class="pill">NT · 27</span>
             </div>
-            <div id="ntList" class="max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
+            <div id="ntList" class="max-h-52 lg:max-h-52 overflow-auto scrollbar-reader pr-1 space-y-2"></div>
           </div>
         </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <div class="lg:col-span-3 flex flex-col gap-3">
+          <!-- Left panel: chapters + verse chips -->
+          <div id="chapterPanel" class="lg:col-span-3 flex flex-col gap-3">
             <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
               <div class="flex items-center justify-between mb-1">
                 <div class="font-extrabold text-gray-800 text-sm">அதிகாரம்</div>
                 <span class="pill text-xs" id="chapterTitle">—</span>
               </div>
-              <div class="text-xs text-gray-400 mb-3" id="bookMeta">—</div>
+              <div class="text-xs text-gray-400 mb-1" id="bookMeta">—</div>
+              <!-- Mobile swipe hint — hidden on desktop -->
+              <div class="lg:hidden text-xs text-blue-400 mb-2" style="font-family:'Cinzel',serif;letter-spacing:0.04em;font-size:0.6rem;">← swipe to browse →</div>
               <div id="chapters" class="flex flex-wrap gap-1.5 max-h-44 overflow-auto scrollbar-reader"></div>
             </div>
             <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm flex-1">
               <div class="font-extrabold text-gray-800 text-sm mb-0.5">வசன எண்கள்</div>
-              <div class="text-xs text-gray-400 mb-3">எண்ணை தொட்டால் → jump</div>
+              <!-- Mobile: swipe hint  Desktop: tap to jump hint -->
+              <div class="text-xs text-gray-400 mb-3">
+                <span class="lg:hidden" style="font-size:0.65rem;">← swipe · தொட்டால் jump →</span>
+                <span class="hidden lg:inline">எண்ணை தொட்டால் → jump</span>
+              </div>
               <div id="verseChips" class="flex flex-wrap gap-1.5 max-h-72 overflow-auto scrollbar-reader">
                 <span class="text-xs text-gray-400">புத்தகம் திற…</span>
               </div>
             </div>
           </div>
-          <div class="lg:col-span-9 flex flex-col gap-3">
+
+          <!-- Right panel: reading area — id="readerColumn" is the scroll target -->
+          <div id="readerColumn" class="lg:col-span-9 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-extrabold text-gray-800">வாசிப்பு</div>
@@ -556,8 +685,6 @@
                   <span class="text-xs font-bold whitespace-nowrap" style="color:rgba(255,255,255,0.75)" id="audioStatusText">தயாராக உள்ளது</span>
                 </div>
               </div>
-
-              <!-- SEEK BAR -->
               <div id="audioSeekWrap" style="position:relative;height:20px;display:flex;align-items:center;margin:6px 0;cursor:pointer;">
                 <div style="position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;">
                   <div id="audioSeekFill" style="height:100%;width:0%;background:linear-gradient(to right,#F59E0B,#E8C97A);border-radius:99px;transition:width 0.1s linear;"></div>
@@ -565,13 +692,10 @@
                 <input id="audioSeekBar" type="range" min="0" max="100" step="0.1" value="0"
                   style="position:absolute;left:0;right:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;padding:0;">
               </div>
-
               <div class="flex justify-between text-xs mb-3" style="color:rgba(255,255,255,0.4);">
                 <span id="audioTimeDisplay">0:00 / 0:00</span>
                 <span id="audioVerseCounter">0 / 0 வசனங்கள்</span>
               </div>
-
-              <!-- CONTROLS -->
               <div class="flex items-center gap-2">
                 <button id="audioBtnPrev"  class="audio-btn audio-btn-sm" title="Previous verse">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
@@ -597,29 +721,17 @@
                     <option value="1.25">1.25x</option>
                     <option value="1.5">1.5x</option>
                   </select>
-                  <span id="audioSpeedLabel" style="display:none;">0.85x</span>
                 </div>
               </div>
-
-              <!-- UNDER CONSTRUCTION -->
               <div id="audioUnderConstruction" style="display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                   <span style="font-size:1.1rem;">🚧</span>
                   <span style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.1em;color:#F59E0B;">AUDIO — UNDER CONSTRUCTION</span>
                 </div>
-                <p style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:8px;">
-                  இந்த அதிகாரத்திற்கான audio file தயாராக இல்லை. Audio dataset மற்றும் copyright உரிமைகளில் உதவ விரும்புபவர்கள் எங்களை தொடர்பு கொள்ளவும்.
-                </p>
-                <a href="mailto:rufinmd23@gmail.com"
-                   style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#F59E0B;border-radius:999px;padding:5px 14px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.08em;text-decoration:none;transition:background 0.2s;"
-                   onmouseover="this.style.background='rgba(245,158,11,0.25)'" onmouseout="this.style.background='rgba(245,158,11,0.15)'">
-                  ✉ Contact Us to Help
-                </a>
+                <p style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:8px;">இந்த அதிகாரத்திற்கான audio file தயாராக இல்லை.</p>
+                <a href="mailto:rufinmd23@gmail.com" style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#F59E0B;border-radius:999px;padding:5px 14px;font-family:'Cinzel',serif;font-size:0.65rem;text-decoration:none;">✉ Contact Us to Help</a>
               </div>
-
-              <p class="text-xs mt-2" style="color:rgba(255,255,255,0.2);">
-                ▶ Play → approximate verse highlighting · Seek bar → drag to any position · Verse chip → jump
-              </p>
+              <p class="text-xs mt-2" style="color:rgba(255,255,255,0.2);">▶ Play → approximate verse highlighting · Seek bar → drag · Verse chip → jump</p>
             </div>
 
             <div id="verseBox" class="verse-box scrollbar-reader" style="height:58vh;font-size:1.05rem;">
@@ -631,100 +743,43 @@
       </div>
     </div>
 
-    <!-- READER FOOTER -->
     <div style="margin-top:2rem;padding:1.5rem;border-top:1px solid rgba(201,168,76,0.08);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
       <div style="display:flex;align-items:center;gap:10px;">
         <svg viewBox="0 0 40 50" width="16" fill="none"><rect x="16" y="0" width="8" height="50" rx="4" fill="rgba(201,168,76,0.4)"/><rect x="0" y="12" width="40" height="8" rx="4" fill="rgba(201,168,76,0.4)"/></svg>
-        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);letter-spacing:0.1em;">இறைவசனம் · TAMIL RC BIBLE</span>
+        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:rgba(201,168,76,0.4);">இறைவசனம் · TAMIL RC BIBLE</span>
       </div>
-      <div style="font-size:0.65rem;color:rgba(100,116,139,0.7);font-family:'Cinzel',serif;letter-spacing:0.06em;">
-        © 2025 · NON-PROFIT · BUILT WITH ✝ BY SJIT
-      </div>
+      <div style="font-size:0.65rem;color:rgba(100,116,139,0.7);font-family:'Cinzel',serif;">© 2025 · NON-PROFIT · BUILT WITH ✝ BY SJIT</div>
     </div>
   </section>
-  <!-- ═══ END READER ═══ -->
 
   <!-- ═══ SONGS ═══ -->
   <section id="screen-songs" class="hidden" style="padding-top:72px;">
     <div style="background:linear-gradient(180deg,#0D1B2A 0%,#060e18 100%);min-height:calc(100vh - 72px);padding:3rem 1rem;display:flex;flex-direction:column;">
       <div style="max-width:700px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;">
-
         <div style="margin-bottom:2.5rem;">
           <div style="display:inline-flex;align-items:center;gap:10px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.28em;color:rgba(201,168,76,0.45);margin-bottom:1rem;">
-            <span style="display:block;width:30px;height:1px;background:rgba(201,168,76,0.3);"></span>
-            COMING SOON
-            <span style="display:block;width:30px;height:1px;background:rgba(201,168,76,0.3);"></span>
+            <span style="display:block;width:30px;height:1px;background:rgba(201,168,76,0.3);"></span>COMING SOON<span style="display:block;width:30px;height:1px;background:rgba(201,168,76,0.3);"></span>
           </div>
-          <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;color:white;letter-spacing:0.04em;margin:0 0 0.5rem;">Songs</h2>
+          <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;color:white;margin:0 0 0.5rem;">Songs</h2>
           <p style="font-family:'Lora',serif;font-style:italic;color:rgba(255,255,255,0.3);font-size:0.9rem;margin:0;">தமிழ் கிறிஸ்தவ பாடல்கள் · Tamil Christian Hymns</p>
         </div>
-
-        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.12);border-radius:24px;padding:3rem 2rem;margin-bottom:2rem;text-align:center;position:relative;overflow:hidden;">
-          <div style="position:absolute;right:-20px;bottom:-20px;opacity:0.03;pointer-events:none;">
-            <svg viewBox="0 0 200 260" width="180" fill="none">
-              <rect x="80" y="0" width="40" height="260" rx="20" fill="#C9A84C"/>
-              <rect x="0" y="70" width="200" height="40" rx="20" fill="#C9A84C"/>
-            </svg>
-          </div>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.12);border-radius:24px;padding:3rem 2rem;margin-bottom:2rem;text-align:center;">
           <div style="width:72px;height:72px;border-radius:20px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem;">🚧</div>
           <div style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.22em;color:rgba(245,158,11,0.7);margin-bottom:0.75rem;">UNDER CONSTRUCTION</div>
-          <h3 style="font-family:'Cinzel',serif;font-size:1.4rem;font-weight:600;color:white;margin:0 0 1rem;letter-spacing:0.04em;">Songs Section Coming Soon</h3>
-          <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;line-height:1.85;max-width:480px;margin:0 auto 2rem;font-family:'Noto Sans Tamil',serif;">
-            நாங்கள் தமிழ் கத்தோலிக்க பாடல்களின் ஒரு முழுமையான தொகுப்பை உருவாக்கி வருகிறோம். இந்தப் பகுதி விரைவில் தயாராகும். நீங்கள் பாடல் lyrics dataset அல்லது copyright உரிமைகளில் உதவ விரும்பினால் எங்களை தொடர்பு கொள்ளுங்கள்.
-          </p>
-          <div style="height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.15),transparent);margin-bottom:2rem;"></div>
-          <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.2em;color:rgba(201,168,76,0.4);margin-bottom:1.25rem;">WHAT WE NEED</div>
-          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:2rem;">
-            <span style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);color:rgba(201,168,76,0.75);border-radius:999px;padding:6px 16px;font-size:0.75rem;font-family:'Cinzel',serif;letter-spacing:0.06em;">🎵 Song Lyrics Dataset</span>
-            <span style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);color:rgba(201,168,76,0.75);border-radius:999px;padding:6px 16px;font-size:0.75rem;font-family:'Cinzel',serif;letter-spacing:0.06em;">📜 Copyright Permissions</span>
-            <span style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);color:rgba(201,168,76,0.75);border-radius:999px;padding:6px 16px;font-size:0.75rem;font-family:'Cinzel',serif;letter-spacing:0.06em;">🎼 Tamil Hymn Translations</span>
-            <span style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);color:rgba(201,168,76,0.75);border-radius:999px;padding:6px 16px;font-size:0.75rem;font-family:'Cinzel',serif;letter-spacing:0.06em;">🙏 Volunteer Contributors</span>
-          </div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1.4rem;font-weight:600;color:white;margin:0 0 1rem;">Songs Section Coming Soon</h3>
+          <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;line-height:1.85;max-width:480px;margin:0 auto 2rem;">நாங்கள் தமிழ் கத்தோலிக்க பாடல்களின் ஒரு முழுமையான தொகுப்பை உருவாக்கி வருகிறோம்.</p>
           <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
-            <a href="mailto:rufinmd23@gmail.com?subject=Songs Dataset Contribution&body=Hello, I would like to help contribute to the Songs section of இறைவசனம்."
-               style="display:inline-flex;align-items:center;gap:8px;background:#C9A84C;color:#0D1B2A;border-radius:999px;padding:11px 24px;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-decoration:none;transition:background 0.2s,transform 0.2s;"
-               onmouseover="this.style.background='#E8C97A';this.style.transform='translateY(-2px)'"
-               onmouseout="this.style.background='#C9A84C';this.style.transform='translateY(0)'">
-              ✉ Contribute Dataset
-            </a>
-            <a href="https://wa.me/919443140793?text=Hi, I want to help with the Songs section of இறைவசனம்"
-               target="_blank"
-               style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:999px;padding:11px 24px;font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.06em;text-decoration:none;transition:background 0.2s,transform 0.2s;"
-               onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.transform='translateY(-2px)'"
-               onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.transform='translateY(0)'">
-              <svg viewBox="0 0 24 24" width="16" fill="rgba(37,211,102,0.9)"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              WhatsApp Us
-            </a>
+            <a href="mailto:rufinmd23@gmail.com?subject=Songs Dataset Contribution" style="display:inline-flex;align-items:center;gap:8px;background:#C9A84C;color:#0D1B2A;border-radius:999px;padding:11px 24px;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:700;text-decoration:none;min-height:44px;">✉ Contribute Dataset</a>
+            <a href="https://wa.me/919443140793" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:999px;padding:11px 24px;font-family:'Cinzel',serif;font-size:0.8rem;text-decoration:none;min-height:44px;">WhatsApp Us</a>
           </div>
         </div>
-
-        <!-- Search preview disabled -->
-        <div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:1.25rem 1.5rem;margin-bottom:2rem;opacity:0.5;pointer-events:none;user-select:none;">
-          <div style="display:flex;gap:10px;">
-            <div style="flex:1;padding:11px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);font-size:0.88rem;font-family:'Noto Sans Tamil',serif;">
-              Song தேடல் — விரைவில் வரும்…
-            </div>
-            <div style="padding:11px 20px;border-radius:12px;background:rgba(201,168,76,0.15);color:rgba(201,168,76,0.4);font-family:'Cinzel',serif;font-size:0.82rem;letter-spacing:0.06em;">
-              Search
-            </div>
-          </div>
-        </div>
-
-        <!-- Songs footer -->
         <div style="margin-top:auto;padding-top:2rem;border-top:1px solid rgba(201,168,76,0.07);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <svg viewBox="0 0 40 50" width="14" fill="none"><rect x="16" y="0" width="8" height="50" rx="4" fill="rgba(201,168,76,0.35)"/><rect x="0" y="12" width="40" height="8" rx="4" fill="rgba(201,168,76,0.35)"/></svg>
-            <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:rgba(201,168,76,0.35);letter-spacing:0.1em;">இறைவசனம் · TAMIL RC BIBLE</span>
-          </div>
-          <div style="font-size:0.6rem;color:rgba(100,116,139,0.5);font-family:'Cinzel',serif;letter-spacing:0.06em;">
-            © 2025 · NON-PROFIT · BUILT WITH ✝ BY SJIT
-          </div>
+          <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:rgba(201,168,76,0.35);">இறைவசனம் · TAMIL RC BIBLE</span>
+          <div style="font-size:0.6rem;color:rgba(100,116,139,0.5);font-family:'Cinzel',serif;">© 2025 · NON-PROFIT · BUILT WITH ✝ BY SJIT</div>
         </div>
-
       </div>
     </div>
   </section>
-  <!-- ═══ END SONGS ═══ -->
 
 </div>
 
